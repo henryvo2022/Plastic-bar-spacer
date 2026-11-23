@@ -5,6 +5,7 @@
  */
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { toCreasedNormals } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { buildSpacerGeometries } from '../../Mau_KH/tinh_toan/web/spacer_geom.js';
 import { Dxf, download, clipPolyline, hatchLines } from './dxf.js';
 
@@ -85,6 +86,9 @@ function resize() {
 }
 function render() { if (renderer) renderer.render(scene, camera); }
 
+// Không vẽ nét viền đen: mô hình hiển thị mịn, chỉ phân biệt mặt bằng ánh sáng (đặt true để bật lại nét CAD)
+const SHOW_EDGES = false;
+
 /** Nét CAD: bỏ đường nối lưng – thành (sản phẩm đùn liền khối). */
 function cadEdges(geo, s) {
   const eg = new THREE.EdgesGeometry(geo, 25), p = eg.attributes.position.array, out = [];
@@ -112,12 +116,12 @@ function build() {
   if (renderer) renderer.domElement.setAttribute('aria-label', viewerLabel());
   if (key === curKey && curParts.length) return;
   curKey = key;
-  curParts = buildSpacerGeometries(s, L, st.e, { curveSegs: L > 1000 ? 8 : 14 });
+  curParts = buildSpacerGeometries(s, L, st.e, { curveSegs: L > 1000 ? 12 : 20 });
   if (ok3d) {
     group.children.slice().forEach(o => { group.remove(o); o.geometry?.dispose(); });
     for (const p of curParts) {
-      group.add(new THREE.Mesh(p.geometry, mat));
-      if (p.edges) group.add(cadEdges(p.geometry, s));
+      group.add(new THREE.Mesh(toCreasedNormals(p.geometry, 0.6), mat));      // làm mịn pháp tuyến trên cung tròn (góc < ~34°), giữ cạnh vuông sắc
+      if (SHOW_EDGES && p.edges) group.add(cadEdges(p.geometry, s));
     }
     if (grid) { scene.remove(grid); grid.geometry.dispose(); }
     const gs = Math.ceil((L * 1.1) / 100) * 100;
