@@ -198,6 +198,23 @@ function export3D() {
   download(dxf.toString(), LT(`ThanhKe_${s.code}_3D_${L}mm_e${String(st.e).replace('.', ',')}.dxf`, `Spacer_${s.code}_3D_${L}mm_e${st.e}.dxf`));
 }
 
+/** Dấu đỏ HAN CORPORATION (cùng hình dạng với biểu tượng trên trang): viền kép bo góc, "HAN" và "CORPORATION". Tâm (cx, cy), rộng w mm, xoay angDeg (ngược chiều kim đồng hồ). */
+function stampDXF(dxf, cx, cy, w, angDeg) {
+  const sc = w / 170, a = angDeg * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a);
+  const W = (lx, ly) => { const x = (lx - 85) * sc, y = -(ly - 32) * sc; return [cx + x * ca - y * sa, cy + x * sa + y * ca]; };
+  const rr = (x0, y0, x1, y1, r) => {
+    const out = [];
+    for (const [ox, oy, a0] of [[x1 - r, y0 + r, -90], [x1 - r, y1 - r, 0], [x0 + r, y1 - r, 90], [x0 + r, y0 + r, 180]])
+      for (let i = 0; i <= 6; i++) { const t = (a0 + 90 * i / 6) * Math.PI / 180; out.push(W(ox + r * Math.cos(t), oy + r * Math.sin(t))); }
+    return out;
+  };
+  dxf.poly('STAMP', rr(2, 2, 168, 62, 9), true, 3 * sc);          // viền ngoài dày
+  dxf.poly('STAMP', rr(8, 8, 162, 56, 5), true, 1.2 * sc);        // viền trong mảnh
+  const [hx, hy] = W(85, 35), [cx2, cy2] = W(85, 50);
+  dxf.text('STAMP', hx, hy, 26 * 0.72 * sc, 'HAN', 1, angDeg);
+  dxf.text('STAMP', cx2, cy2, 11.5 * 0.72 * sc, 'CORPORATION', 1, angDeg);
+}
+
 // =====================================================================================
 // 3. XUẤT DXF BẢN VẼ 2D — chuyển tờ bản vẽ SVG sang DXF đúng tỷ lệ 1:1 (mm)
 // =====================================================================================
@@ -306,6 +323,7 @@ function export2D() {
   });
   dxf.line('FRAME', x0, tbBot, x1, tbBot); dxf.line('FRAME', x0, tbTop, x0, tbBot); dxf.line('FRAME', x1, tbTop, x1, tbBot); dxf.line('FRAME', mid, tbTop, mid, tbBot);
   dxf.poly('FRAME', [[x0 - m, y1 + m], [x1 + m, y1 + m], [x1 + m, tbBot - m], [x0 - m, tbBot - m]], true);
+  stampDXF(dxf, x1 - W * 0.13, tbBot + rh * 0.9, W * 0.17, 6);      // dấu đè lên ô Lập / Kiểm / Duyệt
   download(dxf.toString(), LT(`ThanhKe_${s.code}_banve.dxf`, `Spacer_${s.code}_drawing.dxf`));
 }
 

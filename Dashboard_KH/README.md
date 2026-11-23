@@ -42,3 +42,5 @@ Nội dung:
 5. **Bảng kích thước toàn bộ cỡ** và **nội dung đề nghị khách xác nhận**.
 
 Quy ước: e = khoảng cách từ mặt cắt đầu thanh tới tâm vòm gần nhất của thành A. Lỗ lưng đồng tâm vòm thành A; thành B lệch P/2 (giống mô hình 3D trong `Mau_KH`).
+
+**Dấu HAN CORPORATION:** dấu đỏ hai dòng (HAN / CORPORATION, viền kép bo góc) ở chân thanh bên và đè lên ô Lập / Kiểm / Duyệt của khung tên bản vẽ; trong file DXF vẽ ở lớp `STAMP` (màu đỏ) tại cùng vị trí. Biểu tượng định nghĩa một lần (`<symbol id="seal">`) trong `dashboard.src.html`; hình trong DXF dựng bằng `stampDXF()` trong `web/dash3d.src.js`. Đây là hình dấu minh họa, không phải con dấu pháp lý.

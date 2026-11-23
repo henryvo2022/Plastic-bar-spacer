@@ -12,6 +12,7 @@ export const LAYERS = {
   DETAIL: { color: 3, ltype: 'DASHED' },         // vòng chỉ và khung hình trích
   FRAME: { color: 7, ltype: 'CONTINUOUS' },      // khung bản vẽ, khung tên
   CUT: { color: 7, ltype: 'CONTINUOUS' },        // vết cắt mặt cắt 1-1 và mũi tên chiều nhìn
+  STAMP: { color: 1, ltype: 'CONTINUOUS' },       // dấu đỏ HAN CORPORATION
   BUNG: { color: 7, ltype: 'CONTINUOUS' },       // 3D: bản bụng (mặt đỡ thép)
   CANH_A: { color: 4, ltype: 'CONTINUOUS' },     // 3D: cánh A
   CANH_B: { color: 6, ltype: 'CONTINUOUS' },     // 3D: cánh B
