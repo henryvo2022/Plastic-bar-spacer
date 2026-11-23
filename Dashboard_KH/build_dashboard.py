@@ -23,7 +23,7 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.normpath(os.path.join(HERE, "..", "Mau_KH", "tinh_toan"))
 WEB = os.path.join(SRC, "web")   # dùng chung bộ công cụ (three, esbuild) và spacer_geom.js của trình xem Mẫu KH
-GEO_KEYS = ("kind", "W", "H", "t_w", "t_top", "r_in", "chamfer", "footR", "P", "archW", "archH", "archR", "archDia",
+GEO_KEYS = ("kind", "W", "H", "t_w", "t_top", "r_in", "chamfer", "footR", "outerR", "P", "archW", "archH", "archR", "archDia",
             "archHoleY", "smallDia", "smallHoleY", "slotLen", "slotWid", "slotR", "slotPitch")
 
 
@@ -80,7 +80,7 @@ def main():
         oval_top = g["slotR"] < 0 or g["slotR"] >= g["slotWid"] / 2
         sizes.append(dict(
             H=row["size"], code=row["code"], W=g["W"], tw=g["t_w"], ttop=g["t_top"],
-            chamfer=g.get("chamfer", 0), footR=g.get("footR", 0),
+            chamfer=g.get("chamfer", 0), footR=g.get("footR", 0), outerR=g.get("outerR", 0),
             archW=g["archW"], archH=g["archH"], archR=g["archR"], d=g["archDia"], yh=g["archHoleY"],
             P=g["P"], slotW=g["slotWid"], slotL=g["slotLen"], slotR=g["slotR"], slotP=g.get("slotPitch") or g["P"],
             slotType="oval" if oval_top else "bo góc",

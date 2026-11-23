@@ -100,7 +100,7 @@ export function createSlotHolePath(cx, cy, len, wid, cornerR = -1) {
 /**
  * Dựng các khối của thanh (đã đặt đúng vị trí thế giới).
  * spec: bản ghi hình học theo tên trường của spacer_data.json (W, H, t_w, t_top, P, kind, archW, archH, archR,
- *       archDia, archHoleY, smallDia, smallHoleY, slotLen, slotWid, slotR, slotPitch, chamfer, r_in, holeH, holeL, holeY).
+ *       archDia, archHoleY, smallDia, smallHoleY, slotLen, slotWid, slotR, slotPitch, chamfer, outerR, r_in, holeH, holeL, holeY).
  * Trả về [{ name, geometry, edges }]; edges = true với tấm lưng và hai thành (vẽ nét CAD).
  */
 export function buildSpacerGeometries(spec, L, cutE, { curveSegs = 12 } = {}) {
@@ -112,6 +112,8 @@ export function buildSpacerGeometries(spec, L, cutE, { curveSegs = 12 } = {}) {
     slotLen, slotWid
   } = spec;
   const r_in = spec.r_in || 0, ch = spec.chamfer || 0;
+  const r_out = Math.max(0, Math.min(spec.outerR || 0, t_top - 0.05));   // bo 2 góc ngoài (đỉnh) giữa lưng và thành
+  const wTop = W / 2 - r_out;                                          // nửa bề rộng phần lưng phẳng (hai dải bo nằm ngoài)
   const resA = -halfL + cutE;                          // pha tâm vòm thành A (+Z)
   const parts = [];
 
@@ -123,11 +125,25 @@ export function buildSpacerGeometries(spec, L, cutE, { curveSegs = 12 } = {}) {
       addCutFeature(topShape, createSlotHolePath(sx, 0, slotLen, slotWid, spec.slotR ?? -1), halfL, topNotches);
     }
   }
-  traceEndCutOutline(topShape, [new THREE.Vector2(-halfL, -W / 2), new THREE.Vector2(halfL, -W / 2)], halfL, W / 2, topNotches);
+  traceEndCutOutline(topShape, [new THREE.Vector2(-halfL, -wTop), new THREE.Vector2(halfL, -wTop)], halfL, wTop, topNotches);
   const topGeo = new THREE.ExtrudeGeometry(topShape, { depth: t_top, bevelEnabled: false, curveSegments: curveSegs });
   topGeo.rotateX(Math.PI / 2);                        // shape X -> X, shape Y -> Z, đùn -> -Y
   topGeo.translate(0, H, 0);
   parts.push({ name: 'lung', geometry: topGeo, edges: true });
+  if (r_out > 0) {                                     // hai dải mép lưng có góc ngoài bo R, đùn liền suốt thanh
+    [1, -1].forEach(side => {
+      const pt = (zm, y) => new THREE.Vector2(-side * zm, y), n = 10, sh = new THREE.Shape();
+      sh.moveTo(pt(wTop, H - t_top).x, H - t_top);
+      sh.lineTo(pt(W / 2, H - t_top).x, H - t_top);
+      sh.lineTo(pt(W / 2, H - r_out).x, H - r_out);
+      for (let i = 1; i <= n; i++) { const a = (Math.PI / 2) * i / n; const q = pt(wTop + r_out * Math.cos(a), H - r_out + r_out * Math.sin(a)); sh.lineTo(q.x, q.y); }
+      sh.closePath();
+      const g = new THREE.ExtrudeGeometry(sh, { depth: L, bevelEnabled: false });
+      g.rotateY(Math.PI / 2);
+      g.translate(-halfL, 0, 0);
+      parts.push({ name: 'goc_ngoai', geometry: g, edges: true });
+    });
+  }
 
   // B. Hai thành bên (Y từ 0 tới H - t_top)
   const wallHeight = H - t_top;

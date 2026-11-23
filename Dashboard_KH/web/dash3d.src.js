@@ -167,7 +167,7 @@ function export3D() {
   const st = KH.state(), L = curLen;
   if (!curParts.length) build();
   const dxf = new Dxf();
-  const layerOf = { lung: 'BUNG', thanh_A: 'CANH_A', thanh_B: 'CANH_B', vat: 'VAT_GOC', bo_goc: 'VAT_GOC' };
+  const layerOf = { lung: 'BUNG', thanh_A: 'CANH_A', thanh_B: 'CANH_B', vat: 'VAT_GOC', bo_goc: 'VAT_GOC', goc_ngoai: 'BUNG' };
   for (const part of curParts) {
     const g = part.geometry, pos = g.attributes.position, idx = g.index;
     const map = new Map(), verts = [], tris = [];

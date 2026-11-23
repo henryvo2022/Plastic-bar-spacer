@@ -92,12 +92,14 @@ def page(e, r):
         row("Giới hạn trên lớp bảo vệ", "Upper tolerance limit", num(H + 1), "mm"),
         row("Kích thước tiết diện W × H", "Section W × H", f"{num(sp['W'])} × {num(H)}", "mm"),
         row("Chiều dày cánh / bụng", "Flange / web thickness", thick, "mm"),
+        row("Bo góc ngoài (đỉnh)", "Outer corner radius", f"R{num(sp.get('r_out', 0), 1)}", "mm"),
         row("Bước lỗ P (so le P/2)", "Hole pitch P (staggered P/2)", num(sp["P"]), "mm"),
         row("Đơn vị bán", "Storage unit", "Thanh", "Pce"),
         row("Quy cách đóng gói", "Packaging unit", "Theo thỏa thuận", ""),
     ])
     right = "".join([
         row("Khối lượng", "Weight", num(r["kg"], 3), "kg/thanh", star=True),
+        row("Vát góc trong 45°", "Inner chamfer 45°", num(sp["chamfer"], 1), "mm"),
         row("Khuyết vòm (rộng × cao)", "Arch notch (w × h)", f"{num(sp['Wa'])} × {num(sp['Ha'], 1)}", "mm"),
         row("Lỗ tròn, tâm cách mặt ván", "Round hole, centre height", f"Ø{num(sp['d'])}, {num(sp['yh'], 1)}", "mm"),
         row("Lỗ bụng (dài × rộng)", "Web slot (L × w)", f"{num(sp['Ls'])} × {num(sp['ws'])}", "mm"),

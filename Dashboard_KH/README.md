@@ -47,4 +47,6 @@ Nội dung:
 
 Quy ước: e = khoảng cách từ mặt cắt đầu thanh tới tâm vòm gần nhất của thành A. Lỗ lưng đồng tâm vòm thành A; thành B lệch P/2 (giống mô hình 3D trong `Mau_KH`).
 
+**Bo góc ngoài (đỉnh), 23/11/2026:** hai góc ngoài giữa lưng và thành bo R2,0 (H20–H40) / R2,5 (H50–H70); hiện trên mặt cắt 1-1 (ghi R), chi tiết 1, mô hình 3D (hai dải mép lưng `goc_ngoai`, lớp DXF 3D `BUNG`), DXF bản vẽ, bảng thông số, bảng so sánh và phiếu kỹ thuật. Dữ liệu `outerR` lấy từ `spec.r_out` trong `Mau_KH/tinh_toan/thong_so_mau_kh.json`; hình học 3D nằm trong `Mau_KH/tinh_toan/web/spacer_geom.js`.
+
 **Dấu HAN CORPORATION:** dấu đỏ hai dòng (HAN / CORPORATION, viền kép bo góc) ở chân thanh bên và đè lên ô Lập / Kiểm / Duyệt của khung tên bản vẽ; trong file DXF vẽ ở lớp `STAMP` (màu đỏ) tại cùng vị trí. Biểu tượng định nghĩa một lần (`<symbol id="seal">`) trong `dashboard.src.html`; hình trong DXF dựng bằng `stampDXF()` trong `web/dash3d.src.js`. Đây là hình dấu minh họa, không phải con dấu pháp lý.

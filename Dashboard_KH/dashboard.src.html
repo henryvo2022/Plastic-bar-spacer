@@ -542,7 +542,7 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
         <div class="tbl-wrap">
           <table>
             <thead><tr>
-              <th scope="col" data-en="Size">Cỡ</th><th scope="col">W × H</th><th scope="col" data-en="Flange / web t">Dày cánh / bụng</th><th scope="col" data-en="Inner chamfer">Vát góc trong</th><th scope="col" data-en="Arch notch">Khuyết vòm</th><th scope="col" data-en="Round hole · centre ht">Lỗ tròn · tâm cao</th>
+              <th scope="col" data-en="Size">Cỡ</th><th scope="col">W × H</th><th scope="col" data-en="Flange / web t">Dày cánh / bụng</th><th scope="col" data-en="Inner chamfer / outer R">Vát trong / bo ngoài</th><th scope="col" data-en="Arch notch">Khuyết vòm</th><th scope="col" data-en="Round hole · centre ht">Lỗ tròn · tâm cao</th>
               <th scope="col" data-en="P / stagger">P / so le</th><th scope="col" class="l" data-en="Web slot">Lỗ bụng</th><th scope="col" data-en="Arch crown → web">Đỉnh khuyết vòm → bụng</th><th scope="col" data-en="Arch ↔ round hole">Khuyết vòm ↔ lỗ tròn</th><th scope="col" data-en="Flange open area">Tỷ lệ lỗ trên cánh</th>
             </tr></thead>
             <tbody id="sum-body"></tbody>
@@ -650,10 +650,13 @@ const DATA = /*@DATA@*/{};
   }
   const complement = (iv, lo, hi) => { const out = []; let c = lo; for (const [a, b] of iv) { if (a > c) out.push([c, Math.min(a, hi)]); c = Math.max(c, b); } if (c < hi) out.push([c, hi]); return out.filter(([a, b]) => b > a); };
   function profilePts(s, n = 8) {             // biên dạng đùn, z ∈ [-W/2, W/2]; z < 0 là thành A
-    const pts = [], W = s.W, H = s.H, zi = W / 2 - s.tw, yi = H - s.ttop, c = s.chamfer, rf = Math.min(s.footR, s.tw / 2);
+    const pts = [], W = s.W, H = s.H, zi = W / 2 - s.tw, yi = H - s.ttop, c = s.chamfer, rf = Math.min(s.footR, s.tw / 2), ro = Math.min(s.outerR || 0, s.ttop - 0.05);
     const P = (z, y) => pts.push([z, y]);
     const arc = (zc, yc, r, a0, a1) => { if (r <= 0) return; for (let k = 1; k <= n; k++) { const a = (a0 + (a1 - a0) * k / n) * Math.PI / 180; P(zc + r * Math.cos(a), yc + r * Math.sin(a)); } };
-    P(-W / 2, rf); P(-W / 2, H); P(W / 2, H); P(W / 2, rf); arc(W / 2 - rf, rf, rf, 0, -90);
+    P(-W / 2, rf);
+    if (ro > 0) { P(-W / 2, H - ro); arc(-W / 2 + ro, H - ro, ro, 180, 90); P(W / 2 - ro, H); arc(W / 2 - ro, H - ro, ro, 90, 0); }
+    else { P(-W / 2, H); P(W / 2, H); }
+    P(W / 2, rf); arc(W / 2 - rf, rf, rf, 0, -90);
     P(zi + rf, 0); arc(zi + rf, rf, rf, -90, -180);
     P(zi, yi - c); P(zi - c, yi); P(-zi + c, yi); P(-zi, yi - c); P(-zi, rf); arc(-zi - rf, rf, rf, 0, -90);
     P(-W / 2 + rf, 0); arc(-W / 2 + rf, rf, rf, -90, -180);
@@ -862,6 +865,7 @@ const DATA = /*@DATA@*/{};
     dimV(D, g, YA(H), YA(0), SX(-W / 2) - 18, nf(H), { xa: SX(-W / 2) });
     dimH(D, g, SX(-W / 2), SX(-W / 2 + s.tw), rab + 22, nf(s.tw), { ya: YA(0), side: 'left' });
     dimV(D, g, YA(H), YA(H - s.ttop), SX(W / 4), nf(s.ttop), { side: 'below' });
+    if (s.outerR > 0) { const ro = Math.min(s.outerR, s.ttop - 0.05); leader(D, g, SX(W / 2 - ro + ro * c45), YA(H - ro + ro * c45), SX(W / 2) + 30, ra - 4, 'R' + nf(s.outerR)); }
     txt(g, SX(-W / 2 + s.tw / 2), rab + 50, T('CÁNH A', 'FLANGE A'), { class: 'tag', 'text-anchor': 'middle' });
     txt(g, SX(W / 2 - s.tw / 2), rab + 50, T('CÁNH B', 'FLANGE B'), { class: 'tag', 'text-anchor': 'middle' });
     const cI = [SX(-W / 2 + s.tw), YA(H - s.ttop)], rI = Math.max(12, 1.4 * s.tw * k);
@@ -979,7 +983,7 @@ const DATA = /*@DATA@*/{};
     const nk = neck(s), br = bridge(s), mb = minBridge(s), thin = mb < s.tw;
     $('kpis').innerHTML = [
       kpiHTML(T('Kích thước W × H', 'Size W × H'), `${nf(s.W)} × ${nf(s.H)}<small>mm</small>`, T('H = lớp bê tông bảo vệ', 'H = concrete cover')),
-      kpiHTML(Math.abs(s.tw - s.ttop) < 1e-9 ? T('Chiều dày thành', 'Wall thickness') : T('Dày cánh / bụng', 'Flange / web'), (Math.abs(s.tw - s.ttop) < 1e-9 ? nf(s.tw) : `${nf(s.tw)} / ${nf(s.ttop)}`) + '<small>mm</small>', T(`vát góc trong ${nf(s.chamfer)} × 45°`, `inner chamfer ${nf(s.chamfer)} × 45°`)),
+      kpiHTML(Math.abs(s.tw - s.ttop) < 1e-9 ? T('Chiều dày thành', 'Wall thickness') : T('Dày cánh / bụng', 'Flange / web'), (Math.abs(s.tw - s.ttop) < 1e-9 ? nf(s.tw) : `${nf(s.tw)} / ${nf(s.ttop)}`) + '<small>mm</small>', T(`vát trong ${nf(s.chamfer)}×45° · bo ngoài R${nf(s.outerR)}`, `inner chamfer ${nf(s.chamfer)}×45° · outer R${nf(s.outerR)}`)),
       kpiHTML(T('Bước lỗ P', 'Hole pitch P'), mm(s.P), T(`hai cánh so le ${nf(s.P / 2)} mm`, `flanges offset ${nf(s.P / 2)} mm`)),
       kpiHTML(T('Cách mép lỗ nhỏ nhất', 'Min. edge distance'), mm(mb), thin ? T(`< chiều dày cánh ${nf(s.tw)} mm`, `< flange thickness ${nf(s.tw)} mm`) : T(minEdge(s)[1][1], minEdge(s)[1][2]), thin),
       kpiHTML(T('Tỷ lệ lỗ trên cánh', 'Flange open area'), `${nf(s.open, 0)}<small>%</small>`, T('lỗ / diện tích cánh', 'holes / flange area')),
@@ -1017,12 +1021,12 @@ const DATA = /*@DATA@*/{};
     });
     const rr = rrOf(s), sp = $('specs'); sp.innerHTML = '';
     [[T('Kích thước W × H', 'Size W × H'), `${nf(s.W)} × ${nf(s.H)} mm`], [T('Chiều dày cánh / bụng', 'Flange / web thickness'), `${nf(s.tw)} / ${nf(s.ttop)} mm`],
-     [T('Vát góc trong / bo mép chân', 'Inner chamfer / foot radius'), `${nf(s.chamfer)} × 45° / R${nf(s.footR)}`], [T('Khuyết vòm (rộng × cao)', 'Arch notch (w × h)'), `${nf(s.archW)} × ${nf(s.archH)} mm, R${nf(archRof(s))}`],
+     [T('Vát góc trong', 'Inner chamfer'), `${nf(s.chamfer)} × 45°`], [T('Bo góc ngoài (đỉnh) / bo mép chân', 'Outer corner radius / foot radius'), `R${nf(s.outerR)} / R${nf(s.footR)} mm`], [T('Khuyết vòm (rộng × cao)', 'Arch notch (w × h)'), `${nf(s.archW)} × ${nf(s.archH)} mm, R${nf(archRof(s))}`],
      [T('Lỗ tròn', 'Round hole'), T(`Ø${nf(s.d)}, tâm cao ${nf(s.yh)} mm`, `Ø${nf(s.d)}, centre height ${nf(s.yh)} mm`)], [T('Bước lỗ P / so le', 'Hole pitch P / stagger'), `${nf(s.P)} / ${nf(s.P / 2)} mm`],
      [T('Lỗ bụng', 'Web slot'), `${nf(s.slotL)} × ${nf(s.slotW)} mm, ${s.slotType === 'oval' ? T('oval', 'obround') : T('bo góc R', 'corner R') + nf(rr)}`], [T('Tỷ lệ lỗ trên cánh', 'Flange open area'), `${nf(s.open, 0)}%`],
      [T('Đỉnh khuyết vòm → mặt dưới bụng', 'Arch crown → web underside'), `${nf(nk)} mm`, nk < s.tw], [T('Mép khuyết vòm → mép lỗ tròn', 'Arch edge → round hole edge'), `${nf(br)} mm`, br < s.tw],
      [T('Đỉnh lỗ tròn → mặt dưới bụng', 'Round hole → web underside'), `${nf(holeTop(s))} mm`, holeTop(s) < s.tw], [T('Đáy lỗ tròn → mặt ván', 'Round hole → formwork face'), `${nf(holeBot(s))} mm`, holeBot(s) < s.tw],
-     [T('Mép lỗ bụng → mép ngoài', 'Web slot edge → outer edge'), `${nf((s.W - s.slotW) / 2)} mm`], [T('Khoảng cách 2 lỗ bụng', 'Gap between web slots'), `${nf(s.slotP - s.slotL)} mm`]].forEach(([k, v, w]) => {
+     [T('Mép lỗ bụng → mép ngoài', 'Web slot edge → outer edge'), `${nf((s.W - s.slotW) / 2)} mm`], [T('Khoảng cách 2 lỗ bụng', 'Gap between web slots'), `${nf(s.slotP - s.slotL)} mm`], [T('Chiều dài thanh', 'Bar length'), `${nf(L, 0)} mm`]].forEach(([k, v, w]) => {
       const row = document.createElement('div');
       row.innerHTML = '<dt></dt><dd></dd>'; row.children[0].textContent = k; row.children[1].textContent = v;
       if (w) { const p = document.createElement('span'); p.className = 'pill warn'; p.style.marginLeft = '8px'; p.textContent = T('nhỏ hơn chiều dày cánh', 'below flange thickness'); row.children[1].appendChild(p); }
@@ -1071,7 +1075,7 @@ const DATA = /*@DATA@*/{};
     rows.forEach(([s, i]) => {
       const tr = document.createElement('tr'); const href = '#ban-ve?co=H' + s.H + (LANG === 'en' ? '&lang=en' : '');
       if (i === cur) { tr.className = 'on'; tr.setAttribute('aria-current', 'true'); }
-      const cells = [[`H${s.H}`, 'l'], [`${nf(s.W)} × ${nf(s.H)}`], [`${nf(s.tw)} / ${nf(s.ttop)}`], [`${nf(s.chamfer)} × 45°`],
+      const cells = [[`H${s.H}`, 'l'], [`${nf(s.W)} × ${nf(s.H)}`], [`${nf(s.tw)} / ${nf(s.ttop)}`], [`${nf(s.chamfer)}×45° / R${nf(s.outerR)}`],
         [`${nf(s.archW)} × ${nf(s.archH)}, R${nf(archRof(s))}`], [`Ø${nf(s.d)} · ${nf(s.yh)}`], [`${nf(s.P)} / ${nf(s.P / 2)}`],
         [`${nf(s.slotL)} × ${nf(s.slotW)} ${s.slotType === 'oval' ? 'oval' : 'R' + nf(rrOf(s))}`, 'l'],
         [nf(neck(s)), '', neck(s) < s.tw], [nf(bridge(s)), '', bridge(s) < s.tw], [`${nf(s.open, 0)}%`]];
@@ -1109,7 +1113,7 @@ const DATA = /*@DATA@*/{};
   // ---------- duyệt thiết kế: đánh dấu lưu trong trình duyệt của người xem
   const items = () => {
     const out = [
-      ['bien-dang', T('Mặt cắt ngang', 'Cross-section'), T('W × H, chiều dày cánh và bụng, vát góc trong 45°, bo mép chân R0,5 của từng cỡ.', 'W × H, flange and web thickness, 45° inner chamfer and R0.5 foot radius of each size.')],
+      ['bien-dang', T('Mặt cắt ngang', 'Cross-section'), T('W × H, chiều dày cánh và bụng, vát góc trong 45°, bo góc ngoài (đỉnh) R2,0–2,5 và bo mép chân R0,5 của từng cỡ.', 'W × H, flange and web thickness, 45° inner chamfer, outer corner radius R2.0–2.5 and R0.5 foot radius of each size.')],
       ['lo-thanh', T('Lỗ trên cánh', 'Flange holes'), T('Khuyết vòm xen lỗ tròn, bước P; hai cánh so le P/2.', 'Arch notchs alternating with round holes at pitch P; flanges staggered by P/2.')],
       ['lo-lung', T('Lỗ bụng', 'Web slots'), T('Kích thước, kiểu bo góc / oval, đồng tâm khuyết vòm cánh A.', 'Size, rounded / obround shape, concentric with the flange A arch notchs.')],
       ['dau-thanh', T('Đầu thanh', 'Bar ends'), T('Lỗ dập liên tục nên lỗ ở hai đầu thanh có thể bị cắt hở; không có đoạn đặc ở đầu thanh.', 'Holes are punched continuously, so holes at both bar ends may be cut open; there is no solid zone at the ends.')],
@@ -1168,12 +1172,14 @@ const DATA = /*@DATA@*/{};
       row('Giới hạn trên lớp bảo vệ', 'Upper tolerance limit', nf(H + 1, 0), 'mm'),
       row('Kích thước tiết diện W × H', 'Section W × H', `${nf(s.W, 0)} × ${nf(H, 0)}`, 'mm'),
       row('Chiều dày cánh / bụng', 'Flange / web thickness', thick, 'mm'),
+      row('Bo góc ngoài (đỉnh)', 'Outer corner radius', 'R' + nf(s.outerR), 'mm'),
       row('Bước lỗ P (so le P/2)', 'Hole pitch P (staggered P/2)', nf(s.P, 0), 'mm'),
       row('Đơn vị bán', 'Storage unit', T('Thanh', 'Bar'), 'Pce'),
       row('Quy cách đóng gói', 'Packaging unit', T('Theo thỏa thuận', 'To be agreed'), ''),
     ].join('');
     const right = [
       row('Khối lượng', 'Weight', nf(s.kg, 3), T('kg/thanh', 'kg/bar'), true),
+      row('Vát góc trong 45°', 'Inner chamfer 45°', nf(s.chamfer), 'mm'),
       row('Khuyết vòm (rộng × cao)', 'Arch notch (w × h)', `${nf(s.archW, 0)} × ${nf(s.archH)}`, 'mm'),
       row('Lỗ tròn, tâm cách mặt ván', 'Round hole, centre height', `Ø${nf(s.d, 0)}, ${nf(s.yh)}`, 'mm'),
       row('Lỗ bụng (dài × rộng)', 'Web slot (L × w)', `${nf(s.slotL, 0)} × ${nf(s.slotW, 0)}`, 'mm'),
