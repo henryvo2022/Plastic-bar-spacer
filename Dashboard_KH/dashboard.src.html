@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duyệt thiết kế · Thanh kê PVC chữ U</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Phong cách "framed sheet": khung xám bê tông (sidebar + thanh trên) bao một tờ trắng, không bóng đổ.
+   Lưới: thanh bên 228 + tờ (inset 8px phải/dưới); trong tờ đệm 24, khoảng cách mọi khối 24. */
+:root {
+  color-scheme: light;
+  --ground: #eef1f1;   --surface: #ffffff; --raised: #f4f6f7; --active: #e3e7e8;
+  --border: #e3e6e8;   --rule: #eef0f1;    --control: #cdced1;
+  --text: #131416;     --muted: #5b5e60;
+  --accent: #1b6c80;   --primary: #1d1f20; --on-primary: #ffffff;
+  --positive: #1e7b4f; --negative: #c4242a; --warning: #92400e;
+  --chart-1: #1b6c80;  --chart-muted: #b8c0c4; --grid: #e5e7e8; --chart-span: .06;
+  --ink: var(--text);  --axis-ink: var(--muted);
+  --pill-ok-bg: #dcfae5; --pill-ok-ink: #04250e; --pill-warn-bg: #fffbeb; --pill-warn-ink: #92400e; --pill-warn-line: #fde68a;
+  --pill-neutral-bg: #ebedee; --pill-neutral-ink: #353736;
+  --radius-card: 8px; --radius-control: 6px; --radius-sheet: 16px;
+  --gap: 24px; --pad: 24px; --control-h: 32px; --side-w: 228px; --top-h: 48px;
+  --font: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  /* bản vẽ kỹ thuật (giữ màu quy ước CAD) */
+  --sheet: var(--surface); --line: #1f1f1d; --hidden: #77756f; --center: #c2410c; --dimc: #1d5fbf;
+  --mat: #dfe1e6; --hatch: #9a9da5; --void: #454850; --axis: #c3c6c9; --ink-2: var(--muted);
+  --warnf: #f5a524;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #0b0c0c;   --surface: #141515; --raised: #1c1d1e; --active: #27292a;
+  --border: #2a2c2d;   --rule: #212324;    --control: #4a4c4e;
+  --text: #f2f2f1;     --muted: #b4b6b6;
+  --accent: #5fb0c4;   --primary: #f2f2f1; --on-primary: #111111;
+  --positive: #3fc07a; --negative: #e5566f; --warning: #fab219;
+  --chart-1: #5fb0c4;  --chart-muted: #4a4f53; --grid: #2b2d2e; --chart-span: .12;
+  --pill-ok-bg: #172a1d; --pill-ok-ink: #3fc07a; --pill-warn-bg: #2e2510; --pill-warn-ink: #fab219; --pill-warn-line: #5c4512;
+  --pill-neutral-bg: #27292a; --pill-neutral-ink: #d4d6d6;
+  --line: #ecebe7; --hidden: #9d9b93; --center: #f08a4b; --dimc: #6aa8ff;
+  --mat: #34373d; --hatch: #62666e; --void: #000000; --axis: #3a3d40;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--ground); color: var(--text); font: 14px/20px var(--font); }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--mono); }
+[hidden] { display: none !important; }
+
+/* ---------- khung */
+.app { display: grid; grid-template-columns: var(--side-w) minmax(0, 1fr); grid-template-rows: var(--top-h) 1fr; min-height: 100vh; }
+.side { grid-row: 1 / 3; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 12px 10px 16px; }
+.brand { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 8px; margin-bottom: 18px; }
+.brand svg { width: 28px; height: 28px; flex: none; }
+.brand b { display: block; font-size: 14px; font-weight: 600; line-height: 18px; }
+.brand span { display: block; font-size: 12px; color: var(--muted); line-height: 16px; }
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav-group { font-size: 12px; color: var(--muted); padding: 0 10px; margin: 18px 0 6px; }
+.nav a { display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 10px; border-radius: var(--radius-card); color: var(--text); text-decoration: none; font-size: 14px; }
+.nav a svg { width: 16px; height: 16px; flex: none; color: var(--muted); }
+.nav a:hover { background: var(--active); }
+.nav a[aria-current="page"] { background: var(--active); font-weight: 500; }
+.nav a[aria-current="page"] svg { color: var(--text); }
+.nav .count { margin-left: auto; font-size: 12px; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); display: inline-flex; align-items: center; justify-content: center; }
+.nav .count:empty { display: none; }
+.side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 2px; }
+.side-foot button { display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 10px; border: 0; border-radius: var(--radius-card); background: transparent; cursor: pointer; text-align: left; font-size: 14px; }
+.side-foot button:hover { background: var(--active); }
+.side-foot svg { width: 16px; height: 16px; color: var(--muted); }
+.side-foot .stamp { font-size: 12px; color: var(--muted); padding: 8px 10px 0; line-height: 16px; }
+.side-close { display: none; }
+
+.top { grid-column: 2; display: flex; align-items: center; gap: 16px; padding: 0 8px 0 4px; min-width: 0; }
+.crumb { font-size: 14px; color: var(--muted); white-space: nowrap; }
+.crumb b { color: var(--text); font-weight: 500; }
+.menu-btn { display: none; }
+.sizes { display: inline-flex; gap: 2px; padding: 3px; border-radius: 8px; background: var(--active); }
+.sizes button { height: 28px; min-width: 52px; padding: 0 10px; border: 0; border-radius: 6px; background: transparent; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+.sizes button:hover { color: var(--text); }
+.sizes button[aria-checked="true"] { background: var(--surface); color: var(--text); }
+.lang { margin-left: auto; }
+.lang button { min-width: 40px; }
+.sizes-label { font-size: 13px; color: var(--muted); white-space: nowrap; }
+
+.sheet { grid-column: 2; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sheet); margin: 0 8px 8px 0; padding: var(--pad); min-width: 0; }
+
+/* ---------- tiêu đề màn hình */
+.title-row { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px 24px; margin-bottom: var(--gap); }
+.title-row h1 { font-size: 22px; line-height: 28px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+.title-row .code { font-family: var(--mono); font-weight: 500; }
+.title-row p { margin: 4px 0 0; color: var(--muted); font-size: 14px; max-width: 760px; }
+.title-row p b { color: var(--text); font-weight: 500; }
+.title-row p .flag { color: var(--warning); font-weight: 500; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; height: var(--control-h); padding: 0 12px; border-radius: var(--radius-control); border: 1px solid var(--control); background: var(--surface); cursor: pointer; font-size: 14px; font-weight: 500; white-space: nowrap; text-decoration: none; color: inherit; }
+.btn:hover { background: var(--raised); }
+.btn:active { transform: translateY(1px); }
+.btn svg { width: 16px; height: 16px; }
+.btn.primary { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.btn.primary:hover { filter: brightness(1.25); }
+
+/* ---------- chỉ số: một khối chia vạch */
+.kpis { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); border: 1px solid var(--border); border-radius: var(--radius-card); margin-bottom: var(--gap); }
+.kpi { padding: 14px 20px 16px; min-width: 0; }
+.kpi + .kpi { border-left: 1px solid var(--border); }
+.kpi .k { font-size: 13px; color: var(--muted); font-weight: 500; }
+.kpi .v { font-size: 28px; line-height: 36px; font-weight: 400; margin-top: 4px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.kpi .v small { font-size: 14px; color: var(--muted); margin-left: 4px; }
+.kpi .s { font-size: 12px; color: var(--muted); line-height: 16px; margin-top: 2px; }
+.kpi .s.flag { color: var(--warning); font-weight: 500; }
+
+/* ---------- khối */
+.panel { border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--surface); min-width: 0; }
+.panel + .panel, .grid2 + .panel, .panel + .grid2 { margin-top: var(--gap); }
+.panel-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; padding: 14px 20px; }
+.panel-head h2 { font-size: 16px; line-height: 22px; font-weight: 600; margin: 0; }
+.panel-head .meta { font-size: 12px; color: var(--muted); }
+.panel-body { padding: 0 20px 20px; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: var(--gap); align-items: start; }
+
+/* ---------- tờ bản vẽ (SVG) */
+.dwg-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+svg.dwg { display: block; width: 100%; min-width: 760px; height: auto; }
+.swipe { display: none; font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+svg.dwg text { font-family: var(--font); font-size: 12.5px; fill: var(--ink-2); }
+svg.dwg text.dt { fill: var(--dimc); font-weight: 600; }
+svg.dwg text.ttl { fill: var(--text); font-weight: 600; font-size: 13px; }
+svg.dwg text.sb { fill: var(--muted); font-size: 12px; }
+svg.dwg text.tag { fill: var(--text); font-weight: 600; font-size: 12px; }
+svg.dwg .mat { fill: var(--mat); }
+svg.dwg .hole { fill: var(--sheet); }
+svg.dwg .void { fill: var(--void); }
+svg.dwg .ln { fill: none; stroke: var(--line); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+svg.dwg .hole.ln { fill: var(--sheet); }
+svg.dwg .ln-s { fill: none; stroke: var(--line); stroke-width: .8; stroke-linejoin: round; }
+svg.dwg .hole.ln-s { fill: var(--sheet); }
+svg.dwg .brk { fill: none; stroke: var(--line); stroke-width: 1; }
+svg.dwg .hid { fill: none; stroke: var(--hidden); stroke-width: .9; stroke-dasharray: 6 4; }
+svg.dwg .ctr { fill: none; stroke: var(--center); stroke-width: .8; stroke-dasharray: 16 4 3 4; }
+svg.dwg .dim { fill: none; stroke: var(--dimc); stroke-width: .8; }
+svg.dwg .ext { fill: none; stroke: var(--dimc); stroke-width: .6; opacity: .75; }
+svg.dwg .arw { fill: var(--dimc); }
+svg.dwg .hatchln { stroke: var(--hatch); stroke-width: 1; }
+svg.dwg .callout { fill: none; stroke: var(--ink-2); stroke-width: .9; stroke-dasharray: 3 3; }
+svg.dwg .dbox { fill: var(--sheet); stroke: var(--axis); stroke-width: 1; }
+svg.dwg .rowbg { fill: transparent; stroke: transparent; }
+svg.dwg .selbg { fill: var(--raised); stroke: var(--accent); stroke-width: 1.2; }
+svg.dwg .barrow { cursor: pointer; }
+svg.dwg .barrow:hover .rowbg { fill: var(--raised); }
+svg.dwg .barrow:focus { outline: none; }
+svg.dwg .barrow:focus-visible .rowbg, svg.dwg .barrow:focus-visible .selbg { stroke: var(--accent); stroke-width: 2; }
+
+/* khung tên + thông số */
+.tblock { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--border); font-size: 13px; }
+.tblock > div { padding: 8px 20px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); min-width: 0; }
+.tblock > div:nth-child(4n) { border-right: 0; }
+.tblock .k { font-size: 12px; color: var(--muted); }
+.tblock .v { font-weight: 500; }
+.tblock .wide { grid-column: span 2; }
+.kv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
+.kv > div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; min-height: 40px; padding: 9px 0; border-bottom: 1px solid var(--rule); }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+.pill { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 4px; font-size: 12px; font-weight: 500; white-space: nowrap; flex: none; }
+.pill.warn { background: var(--pill-warn-bg); color: var(--pill-warn-ink); border: 1px solid var(--pill-warn-line); }
+.pill.ok { background: var(--pill-ok-bg); color: var(--pill-ok-ink); }
+.pill.neutral { background: var(--pill-neutral-bg); color: var(--pill-neutral-ink); }
+
+/* ---------- điều khiển */
+.seg { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; border-radius: 8px; background: var(--active); }
+.seg button { height: 28px; padding: 0 10px; border: 0; border-radius: 6px; background: transparent; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; }
+.seg button:hover { color: var(--text); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--text); }
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.rng { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.rng input { width: 200px; accent-color: var(--accent); }
+.rng output { color: var(--text); font-weight: 500; font-variant-numeric: tabular-nums; min-width: 4.5em; }
+
+/* ---------- 3D */
+.viewer { position: relative; height: clamp(380px, 62vh, 640px); background: var(--surface); touch-action: none; border-top: 1px solid var(--rule); border-radius: 0 0 var(--radius-card) var(--radius-card); overflow: hidden; }
+.viewer canvas { display: block; width: 100%; height: 100%; }
+.hint { font-size: 12px; color: var(--muted); padding: 10px 20px 12px; border-top: 1px solid var(--rule); }
+
+/* ---------- biểu đồ */
+.chart { min-height: 200px; }
+.chart svg text { font-family: var(--font); }
+.note { font-size: 13px; color: var(--muted); margin: 12px 0 0; }
+
+/* ---------- bảng */
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 0 12px; height: 46px; text-align: right; border-bottom: 1px solid var(--rule); white-space: nowrap; font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; padding-left: 20px; }
+th:last-child, td:last-child { padding-right: 20px; }
+thead th { height: 38px; font-size: 12px; font-weight: 400; color: var(--muted); border-bottom: 1px solid var(--border); }
+td.l, th.l { text-align: left; }
+td.dim { color: var(--muted); }
+tbody tr { cursor: pointer; }
+tbody tr:hover > * { background: var(--raised); }
+tbody tr.on > * { background: var(--active); }
+tbody tr.on > :first-child { font-weight: 600; }
+td .pill { margin-left: 6px; }
+.empty { margin: 0 20px 20px; padding: 10px 14px; border: 1px dashed var(--control); border-radius: 8px; color: var(--muted); font-size: 13px; }
+
+/* ---------- duyệt */
+.checks { list-style: none; margin: 0; padding: 0; }
+.checks li { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 14px; align-items: start; padding: 14px 20px; border-top: 1px solid var(--rule); }
+.checks input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--primary); cursor: pointer; }
+.checks label { cursor: pointer; }
+.checks label b { font-weight: 600; display: block; }
+.checks label span { color: var(--muted); }
+.checks li.done label b { color: var(--muted); }
+.progress { height: 8px; border-radius: 4px; background: var(--active); overflow: hidden; margin-top: 10px; }
+.progress i { display: block; height: 100%; background: var(--chart-1); border-radius: 4px; }
+textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid var(--control); border-radius: var(--radius-control); background: var(--surface); resize: vertical; }
+.field-label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+.conv { margin: 0; padding: 0 20px 16px 38px; color: var(--muted); }
+.conv li { margin-bottom: 8px; }
+.conv li b { color: var(--text); font-weight: 500; }
+
+/* ---------- máy tính bảng + điện thoại: khung tan, tờ thành màn hình */
+@media (max-width: 1100px) {
+  .grid2 { grid-template-columns: 1fr; }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi:nth-child(odd) { border-left: 0; }
+  .kpi:nth-child(n + 3) { border-top: 1px solid var(--border); }
+  .kpis[style*="--n: 5"] .kpi:last-child, .kpis[style*="--n:5"] .kpi:last-child { grid-column: 1 / -1; }
+}
+@media (max-width: 900px) {
+  .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
+  .top { grid-column: 1; position: sticky; top: 0; z-index: 20; background: var(--ground); flex-wrap: wrap; padding: 6px 12px; gap: 6px 12px; }
+  .menu-btn { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 0; border-radius: 8px; background: transparent; cursor: pointer; }
+  .menu-btn svg { width: 20px; height: 20px; }
+  .crumb { font-size: 15px; }
+  .crumb span { display: none; }
+  .sizes { margin-left: 0; width: 100%; overflow-x: auto; }
+  .sizes button { flex: 1 0 auto; height: 36px; }
+  .sizes-label { display: none; }
+  .side { position: fixed; inset: 0; z-index: 40; width: 100%; height: 100%; background: var(--ground); padding: 12px 16px; display: none; }
+  .side.open { display: flex; }
+  .side-close { display: inline-flex; margin-left: auto; width: 40px; height: 40px; align-items: center; justify-content: center; border: 0; background: transparent; border-radius: 8px; cursor: pointer; }
+  .nav a, .side-foot button { height: 44px; font-size: 15px; }
+  .sheet { grid-column: 1; margin: 0; border-radius: 0; border-width: 1px 0 0; padding: 16px; }
+  .title-row h1 { font-size: 20px; }
+  .tblock { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tblock > div:nth-child(4n) { border-right: 1px solid var(--rule); }
+  .tblock > div:nth-child(2n) { border-right: 0; }
+  .kv { grid-template-columns: 1fr; }
+  .swipe { display: block; padding: 0 20px 12px; }
+  .btn { height: 40px; }
+  .seg button { height: 36px; }
+}
+@media (max-width: 480px) {
+  .kpi { padding: 12px 14px; }
+  .kpi .v { font-size: 22px; line-height: 30px; }
+  .panel-head { padding: 12px 14px; }
+  .panel-body { padding: 0 14px 14px; }
+  .rng input { width: 100%; }
+  .rng { width: 100%; flex-wrap: wrap; }
+  .actions { width: 100%; }
+  .actions .btn { flex: 1 1 auto; justify-content: center; }
+  .checks li { padding: 12px 14px; }
+}
+@media print {
+  @page { size: A4; margin: 10mm; }
+  body { background: #fff; }
+  .app { display: block; }
+  .side, .top, .actions, .controls, .swipe, .hint { display: none !important; }
+  .sheet { border: 0; margin: 0; padding: 0; }
+  .view[hidden] { display: block !important; break-before: page; }
+  svg.dwg { min-width: 0; }
+  .panel { break-inside: avoid; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="side" id="side" aria-label="Điều hướng" data-en-aria="Navigation">
+    <div class="brand">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="7" fill="var(--accent)"/><path d="M7 21V8.5c0-.8.7-1.5 1.5-1.5h11c.8 0 1.5.7 1.5 1.5V21h-3.4v-9.6c0-.4-.3-.7-.7-.7h-5.8c-.4 0-.7.3-.7.7V21z" fill="#fff"/></svg>
+      <div><b data-en="PVC rebar spacer">Thanh kê PVC</b><span data-en="Client set · H20–H70">Bộ Mẫu KH · H20–H70</span></div>
+      <button class="side-close" type="button" id="btn-close" aria-label="Đóng menu" data-en-aria="Close menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <nav class="nav" aria-label="Màn hình" data-en-aria="Screens">
+      <a href="#ban-ve" data-route="ban-ve"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="1.5"/><path d="M3.5 15.5h17M12 15.5v4M7 8v4h4"/></svg><span data-en="Drawing">Bản vẽ</span></a>
+      <a href="#mo-hinh-3d" data-route="mo-hinh-3d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg><span data-en="3D model">Mô hình 3D</span></a>
+      <a href="#thanh-cat" data-route="thanh-cat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="6" cy="7" r="2.5"/><circle cx="6" cy="17" r="2.5"/><path d="M8 8.5L20 17M8 15.5L20 7"/></svg><span data-en="Cut bars">Thanh cắt</span></a>
+      <a href="#so-sanh" data-route="so-sanh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span data-en="Size comparison">So sánh cỡ</span></a>
+      <a href="#duyet" data-route="duyet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg><span data-en="Design review">Duyệt thiết kế</span><span class="count num" id="nav-open" title="Mục chưa xác nhận" data-en-title="Unconfirmed items"></span></a>
+    </nav>
+    <div class="side-foot">
+      <button type="button" id="btn-theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/></svg><span id="theme-label">Giao diện tối</span></button>
+      <button type="button" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 9V3.5h10V9M7 17H4.5V9.5h15V17H17M7 14h10v6.5H7z"/></svg><span data-en="Print / save PDF">In / lưu PDF</span></button>
+      <p class="stamp" id="stamp">--</p>
+    </div>
+  </aside>
+
+  <header class="top">
+    <button class="menu-btn" type="button" id="btn-menu" aria-label="Mở menu" data-en-aria="Open menu" aria-controls="side" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <div class="crumb"><span data-en="Client set / ">Mẫu KH / </span><b id="crumb">Bản vẽ</b></div>
+    <div class="seg lang" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-lang="vi" aria-pressed="true" title="Tiếng Việt">VI</button><button type="button" data-lang="en" aria-pressed="false" title="English">EN</button></div>
+    <span class="sizes-label" id="sizes-label" data-en="Size">Cỡ</span>
+    <div class="sizes" role="radiogroup" aria-label="Lọc theo cỡ" data-en-aria="Filter by size" id="tabs"></div>
+  </header>
+
+  <main class="sheet" id="main">
+
+    <!-- ===== Bản vẽ ===== -->
+    <section class="view" id="view-ban-ve" aria-labelledby="h-ban-ve">
+      <div class="title-row">
+        <div>
+          <h1 id="h-ban-ve"><span class="code" id="t-code">--</span> · <span id="t-size">--</span></h1>
+          <p id="t-finding">--</p>
+        </div>
+        <div class="actions">
+          <button class="btn" type="button" onclick="window.print()"><span data-en="Print / PDF">In / PDF</span></button>
+          <button class="btn primary" type="button" id="btn-dxf2d" title="Bản vẽ cỡ đang chọn, tỷ lệ 1:1, đơn vị mm, mở bằng AutoCAD" data-en-title="Drawing of the selected size, scale 1:1, units mm, opens in AutoCAD">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg><span data-en="Export drawing DXF">Xuất DXF bản vẽ</span></button>
+        </div>
+      </div>
+      <div class="kpis" id="kpis" style="--n: 5"></div>
+      <div class="panel">
+        <div class="panel-head"><h2 data-en="Drawing sheet">Tờ bản vẽ</h2><span class="meta" data-en="Partial view, 2.5 hole pitches · units mm">Hình vẽ trích đoạn 2,5 bước lỗ · đơn vị mm</span></div>
+        <div class="dwg-scroll" style="padding: 0 12px 8px"><svg id="d-sheet" class="dwg" role="img"></svg></div>
+        <p class="swipe" data-en="Swipe sideways to see the whole drawing.">Vuốt ngang để xem hết bản vẽ.</p>
+        <div class="tblock" id="tblock"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2 data-en="Geometry">Thông số hình học</h2><span class="meta" data-en="Nominal dimensions, tolerances not yet specified">Kích thước danh nghĩa, chưa ghi dung sai</span></div>
+        <div class="panel-body"><dl class="kv" id="specs"></dl></div>
+      </div>
+    </section>
+
+    <!-- ===== Mô hình 3D ===== -->
+    <section class="view" id="view-mo-hinh-3d" aria-labelledby="h-3d" hidden>
+      <div class="title-row">
+        <div>
+          <h1 id="h-3d"><span data-en="3D model">Mô hình 3D</span> · <span class="code" id="t3-code">--</span></h1>
+          <p id="m3d-head">--</p>
+        </div>
+        <div class="actions">
+          <button class="btn primary" type="button" id="btn-dxf3d" title="Mô hình lưới 3D của thanh đang xem, đơn vị mm, mở bằng AutoCAD" data-en-title="3D mesh of the bar shown, units mm, opens in AutoCAD">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg><span data-en="Export 3D DXF">Xuất DXF 3D</span></button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <div class="controls">
+            <div class="seg" role="group" aria-label="Chiều dài hiển thị" data-en-aria="Displayed length">
+              <button type="button" data-len="2000" aria-pressed="true" data-en="2 m bar">Thanh 2 m</button>
+              <button type="button" data-len="400" aria-pressed="false" data-en="400 mm bar end">Đoạn 400 mm đầu thanh</button>
+            </div>
+            <div class="seg" role="group" aria-label="Góc nhìn" data-en-aria="View">
+              <button type="button" data-view="iso" aria-pressed="true" data-en="Isometric">Trục đo</button>
+              <button type="button" data-view="left" aria-pressed="false" data-en="Left end">Đầu trái</button>
+              <button type="button" data-view="right" aria-pressed="false" data-en="Right end">Đầu phải</button>
+              <button type="button" data-view="side" aria-pressed="false" data-en="Side">Mặt bên</button>
+              <button type="button" data-view="top" aria-pressed="false" data-en="Top">Mặt trên</button>
+            </div>
+          </div>
+          <a class="meta" href="#thanh-cat" data-en="Change bar / cut position">Đổi thanh / vị trí cắt</a>
+        </div>
+        <div class="viewer" id="v3d"></div>
+        <p class="hint" data-en="Drag to rotate · scroll to zoom · right-drag to pan. Flange A faces the front. The DXF opens in AutoCAD; save as .dwg if needed.">Kéo để xoay · cuộn để phóng to · kéo chuột phải để dời. Cánh A ở phía trước. File DXF mở bằng AutoCAD, lưu thành .dwg nếu cần.</p>
+      </div>
+    </section>
+
+    <!-- ===== Thanh cắt ===== -->
+    <section class="view" id="view-thanh-cat" aria-labelledby="h-cut" hidden>
+      <div class="title-row">
+        <div>
+          <h1 id="h-cut" data-en="Bar ends at random cut positions">Đầu thanh khi cắt ngẫu nhiên</h1>
+          <p data-en="The profile is extruded and punched continuously at pitch P. The 2,000 mm cut-off is not synchronised with the punch, so each bar end falls anywhere within one hole pitch.">Profile đùn ép và dập lỗ liên tục theo bước P. Máy cắt thanh dài 2 000 mm không đồng bộ với khuôn dập, nên đầu thanh rơi vào vị trí bất kỳ trong một bước lỗ.</p>
+        </div>
+        <div class="actions">
+          <button class="btn primary" type="button" id="btn-rand">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h3l10 10h3M4 17h3l3-3M14 10l3-3h3M18 5l2 2-2 2M18 15l2 2-2 2"/></svg><span data-en="Cut 3 new bars">Cắt 3 thanh khác</span></button>
+        </div>
+      </div>
+      <div class="kpis" id="kpis-cut" style="--n: 4"></div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2 data-en="Three bars cut from the same line">Ba thanh cắt từ cùng một dây chuyền</h2>
+          <label class="rng" for="rng"><span data-en="Left end of bar &lt;b id=&quot;rng-bar&quot;&gt;1&lt;/b&gt;, e =">Đầu trái thanh <b id="rng-bar">1</b>, e =</span>
+            <input type="range" id="rng" min="0" step="0.5" value="0"><output id="rng-out" for="rng">--</output></label>
+        </div>
+        <div class="dwg-scroll" style="padding: 0 12px 12px"><svg id="d-over" class="dwg" role="img"></svg></div>
+        <p class="swipe" data-en="Swipe sideways; tap a bar to select it.">Vuốt ngang để xem hết; bấm một thanh để chọn.</p>
+        <p class="hint" data-en="e = distance from the bar end to the nearest arch-opening centre on flange A, 0 ≤ e &amp;lt; P. The selected bar is shown on the 3D model screen.">e = khoảng cách từ đầu thanh tới tâm lỗ vòm gần nhất trên cánh A, 0 ≤ e &lt; P. Thanh đang chọn được hiển thị ở màn hình Mô hình 3D.</p>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2 data-en="Bar ends with a strip narrower than the flange thickness">Tỷ lệ đầu thanh có dải nhựa hẹp hơn chiều dày cánh</h2><span class="meta" data-en="By size, over all cut positions">Theo cỡ, xét mọi vị trí cắt</span></div>
+        <div class="panel-body"><div class="chart" id="ch-thin"></div><p class="note" id="ch-thin-note">--</p></div>
+      </div>
+    </section>
+
+    <!-- ===== So sánh cỡ ===== -->
+    <section class="view" id="view-so-sanh" aria-labelledby="h-cmp" hidden>
+      <div class="title-row">
+        <div>
+          <h1 id="h-cmp" data-en="Size comparison">So sánh các cỡ</h1>
+          <p id="cmp-finding">--</p>
+        </div>
+        <div class="seg" role="group" aria-label="Lọc bảng" data-en-aria="Filter table">
+          <button type="button" data-filter="all" aria-pressed="true" data-en="All sizes">Tất cả cỡ</button>
+          <button type="button" data-filter="flag" aria-pressed="false" data-en="Needs attention">Cần lưu ý</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2 data-en="Minimum edge distance / flange thickness">Khoảng cách mép lỗ nhỏ nhất / chiều dày cánh</h2><span class="meta" data-en="Below 1.00 = narrower than the flange">Dưới 1,00 là hẹp hơn chiều dày cánh</span></div>
+        <div class="panel-body"><div class="chart" id="ch-bridge"></div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2 data-en="Dimension table">Bảng kích thước</h2><span class="meta" id="tbl-count">--</span></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th data-en="Size">Cỡ</th><th>W × H</th><th data-en="Flange / web t">Dày cánh / bụng</th><th data-en="Inner chamfer">Vát góc trong</th><th data-en="Arch opening">Lỗ vòm</th><th data-en="Round hole · centre ht">Lỗ tròn · tâm cao</th>
+              <th data-en="P / stagger">P / so le</th><th class="l" data-en="Web slot">Lỗ bụng</th><th data-en="Arch crown → web">Đỉnh lỗ vòm → bụng</th><th data-en="Arch ↔ round hole">Lỗ vòm ↔ lỗ tròn</th><th data-en="Flange open area">Tỷ lệ lỗ trên cánh</th>
+            </tr></thead>
+            <tbody id="sum-body"></tbody>
+          </table>
+        </div>
+        <p class="empty" id="tbl-empty" hidden data-en="No size has an edge distance below the flange thickness.">Không có cỡ nào có khoảng cách mép lỗ nhỏ hơn chiều dày cánh.</p>
+      </div>
+    </section>
+
+    <!-- ===== Duyệt thiết kế ===== -->
+    <section class="view" id="view-duyet" aria-labelledby="h-rev" hidden>
+      <div class="title-row">
+        <div>
+          <h1 id="h-rev" data-en="Design review">Duyệt thiết kế</h1>
+          <p id="rev-sub">--</p>
+        </div>
+        <div class="actions">
+          <button class="btn" type="button" id="btn-reset" data-en="Clear ticks">Bỏ đánh dấu</button>
+          <a class="btn primary" id="btn-mail" href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="1.5"/><path d="M4 7l8 6 8-6"/></svg><span data-en="Email the result">Gửi kết quả qua email</span></a>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel-head"><h2 data-en="Items to confirm">Nội dung đề nghị xác nhận</h2><span class="meta num" id="rev-count">--</span></div>
+          <div class="panel-body" style="padding-bottom:12px"><div class="progress" aria-hidden="true"><i id="rev-bar" style="width:0"></i></div></div>
+          <ul class="checks" id="review"></ul>
+        </div>
+        <div>
+          <div class="panel">
+            <div class="panel-head"><h2 data-en="Notes">Ghi chú gửi kèm</h2><span class="meta" id="note-saved"></span></div>
+            <div class="panel-body">
+              <label class="field-label" for="rev-note" data-en="Client comments">Ý kiến của khách hàng</label>
+              <textarea id="rev-note" placeholder="Ví dụ: đồng ý H50–H70; H30 đề nghị hạ lỗ vòm." data-en-ph="E.g. H50–H70 approved; H30: lower the arch opening."></textarea>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h2 data-en="Drawing conventions">Quy ước trên bản vẽ</h2></div>
+            <ul class="conv">
+              <li data-en="&lt;b&gt;Web&lt;/b&gt;: the top plate carrying the rebar. &lt;b&gt;Flanges A and B&lt;/b&gt;: the two legs standing on the formwork. Holes in the two flanges are staggered by P/2."><b>Bụng</b> là bản trên đỡ thép; <b>cánh A, cánh B</b> là hai bản đứng tì lên ván khuôn. Lỗ trên hai cánh so le nhau P/2.</li>
+              <li data-en="&lt;b&gt;Web slots&lt;/b&gt; are concentric with the arch openings of flange A; the round holes of flange B share the same centre line."><b>Lỗ bụng</b> đồng tâm với lỗ vòm cánh A; lỗ tròn cánh B cùng đường tâm.</li>
+              <li data-en="&lt;b&gt;The cross-section&lt;/b&gt; is taken where there are no holes, i.e. the extrusion die profile."><b>Mặt cắt ngang</b> lấy tại vị trí không có lỗ, đúng biên dạng khuôn đùn.</li>
+              <li data-en="&lt;b&gt;Weight and safety factors&lt;/b&gt; are not included yet; they will be added once the geometry is fixed."><b>Khối lượng và hệ số an toàn</b> chưa đưa vào; bổ sung sau khi chốt hình học.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>/*@CHARTS@*/</script>
+<script>
+const DATA = /*@DATA@*/{};
+(function () {
+  const S = DATA.sizes, L = DATA.bar_len || 2000;
+  const NS = 'http://www.w3.org/2000/svg';
+  const $ = id => document.getElementById(id);
+  // ngôn ngữ hiển thị: 'vi' | 'en' (ghi nhớ trên máy người xem)
+  let LANG = (() => { try { return JSON.parse(localStorage.getItem('kh-lang')) === 'en' ? 'en' : 'vi'; } catch (e) { return 'vi'; } })();
+  const T = (vi, en) => (LANG === 'en' ? en : vi);
+  const LOC = () => (LANG === 'en' ? 'en-US' : 'vi-VN');
+  const nf = (x, d = 1) => Number(x).toLocaleString(LOC(), { maximumFractionDigits: d });
+  const nf2 = x => Number(x).toLocaleString(LOC(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const rd = v => Math.round(v * 100) / 100;
+  const el = (tag, a = {}, p) => { const e = document.createElementNS(NS, tag); for (const k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e; };
+  const txt = (p, x, y, s, a = {}) => { const t = el('text', Object.assign({ x: rd(x), y: rd(y) }, a), p); t.textContent = s; return t; };
+  const line = (p, x1, y1, x2, y2, cls, extra = {}) => el('line', Object.assign({ x1: rd(x1), y1: rd(y1), x2: rd(x2), y2: rd(y2), class: cls }, extra), p);
+  let uid = 0;
+
+  // ---------- hình học
+  const rrOf = s => (s.slotR >= 0 && s.slotR < s.slotW / 2) ? s.slotR : s.slotW / 2;
+  const archRof = s => Math.min(s.archR, s.archW / 2, s.archH);
+  const positions = (res, P, lo, hi) => { const out = []; for (let x = res + Math.ceil((lo - res) / P) * P; x <= hi + 1e-9; x += P) out.push(x); return out; };
+  const distN = (x, res, P) => { const m = (((x - res) % P) + P) % P; return Math.min(m, P - m); };
+  const archTop = (s, dx) => { const R = archRof(s), a = s.archW / 2 - R; return dx <= a ? s.archH : s.archH - R + Math.sqrt(Math.max(0, R * R - (dx - a) ** 2)); };
+  function wallVoidsAt(s, x, res) {            // khoảng y bị rỗng trên thành tại vị trí x (res = pha tâm vòm)
+    const out = [];
+    const dA = distN(x, res, s.P); if (dA < s.archW / 2) out.push([0, archTop(s, dA)]);
+    if (s.d > 0) { const dH = distN(x, res + s.P / 2, s.P); if (dH < s.d / 2) { const ch = Math.sqrt((s.d / 2) ** 2 - dH * dH); out.push([s.yh - ch, s.yh + ch]); } }
+    return out.sort((a, b) => a[0] - b[0]);
+  }
+  function slotVoidAt(s, x, res) {             // khoảng z bị rỗng trên lưng tại x
+    if (s.slotW <= 0) return null;
+    const d = distN(x, res, s.slotP), hl = s.slotL / 2, rr = rrOf(s);
+    if (d >= hl) return null;
+    const a = hl - rr, hw = d <= a ? s.slotW / 2 : (s.slotW / 2 - rr) + Math.sqrt(Math.max(0, rr * rr - (d - a) ** 2));
+    return [s.W / 2 - hw, s.W / 2 + hw];
+  }
+  const complement = (iv, lo, hi) => { const out = []; let c = lo; for (const [a, b] of iv) { if (a > c) out.push([c, Math.min(a, hi)]); c = Math.max(c, b); } if (c < hi) out.push([c, hi]); return out.filter(([a, b]) => b > a); };
+  function profilePts(s, n = 8) {             // biên dạng đùn, z ∈ [-W/2, W/2]; z < 0 là thành A
+    const pts = [], W = s.W, H = s.H, zi = W / 2 - s.tw, yi = H - s.ttop, c = s.chamfer, rf = Math.min(s.footR, s.tw / 2);
+    const P = (z, y) => pts.push([z, y]);
+    const arc = (zc, yc, r, a0, a1) => { if (r <= 0) return; for (let k = 1; k <= n; k++) { const a = (a0 + (a1 - a0) * k / n) * Math.PI / 180; P(zc + r * Math.cos(a), yc + r * Math.sin(a)); } };
+    P(-W / 2, rf); P(-W / 2, H); P(W / 2, H); P(W / 2, rf); arc(W / 2 - rf, rf, rf, 0, -90);
+    P(zi + rf, 0); arc(zi + rf, rf, rf, -90, -180);
+    P(zi, yi - c); P(zi - c, yi); P(-zi + c, yi); P(-zi, yi - c); P(-zi, rf); arc(-zi - rf, rf, rf, 0, -90);
+    P(-W / 2 + rf, 0); arc(-W / 2 + rf, rf, rf, -90, -180);
+    return pts;
+  }
+  function archPts(s, c, n = 8) {
+    const R = archRof(s), xl = c - s.archW / 2, xr = c + s.archW / 2, h = s.archH, pts = [[xl, 0], [xl, h - R]];
+    for (let i = 1; i <= n; i++) { const a = Math.PI - (Math.PI / 2) * i / n; pts.push([xl + R + R * Math.cos(a), h - R + R * Math.sin(a)]); }
+    for (let i = 1; i <= n; i++) { const a = Math.PI / 2 - (Math.PI / 2) * i / n; pts.push([xr - R + R * Math.cos(a), h - R + R * Math.sin(a)]); }
+    pts.push([xr, 0]); return pts;
+  }
+  function rrectPts(cx, cz, len, wid, rr, n = 8) {
+    const pts = [], hx = len / 2 - rr, hz = wid / 2 - rr;
+    for (const [ox, oz, a0] of [[hx, hz, 0], [-hx, hz, 90], [-hx, -hz, 180], [hx, -hz, 270]])
+      for (let i = 0; i <= n; i++) { const a = (a0 + 90 * i / n) * Math.PI / 180; pts.push([cx + ox + rr * Math.cos(a), cz + oz + rr * Math.sin(a)]); }
+    return pts;
+  }
+  const circlePts = (cx, cy, r, n = 36) => Array.from({ length: n }, (_, i) => [cx + r * Math.cos(2 * Math.PI * i / n), cy + r * Math.sin(2 * Math.PI * i / n)]);
+  const pathOf = (pts, f, close = true) => 'M' + pts.map(p => { const q = f(p[0], p[1]); return rd(q[0]) + ',' + rd(q[1]); }).join(' L') + (close ? ' Z' : '');
+
+  // ---------- phân tích mặt cắt đầu thanh (đầu thanh tại x = 0, thanh nằm ở x > 0)
+  function analyze(s, face, phi) {
+    const P = s.P;
+    const feats = face === 'A' ? [{ n: 'lỗ vòm', res: phi, h: s.archW / 2 }, { n: 'lỗ tròn', res: phi + P / 2, h: s.d / 2 }]
+      : face === 'B' ? [{ n: 'lỗ vòm', res: phi + P / 2, h: s.archW / 2 }, { n: 'lỗ tròn', res: phi, h: s.d / 2 }]
+      : [{ n: 'lỗ bụng', res: phi, h: s.slotL / 2, P: s.slotP }];
+    let best = null;
+    for (const f of feats) {
+      if (!(f.h > 0)) continue;
+      const PP = f.P || P, c = f.res + PP * Math.ceil((-f.h - f.res) / PP + 1e-9), left = c - f.h;
+      if (left < 1e-6) return { cut: true, n: f.n };
+      if (!best || left < best.gap) best = { gap: left, n: f.n };
+    }
+    return best ? Object.assign({ cut: false, warn: best.gap < s.tw }, best) : { cut: false, gap: Infinity, n: '' };
+  }
+  function endStats(s) {
+    let cut = 0, thin = 0; const N = 2000;
+    for (let i = 0; i < N; i++) {
+      const phi = (i + 0.5) / N * s.P, r = ['A', 'T', 'B'].map(f => analyze(s, f, phi));
+      if (r.some(x => x.cut)) cut++; if (r.some(x => x.warn)) thin++;
+    }
+    return { cut: cut / N, thin: thin / N };
+  }
+
+  // ---------- công cụ vẽ
+  function defs(svg) {
+    const id = ++uid, dd = el('defs', {}, svg);
+    const m = el('marker', { id: 'a' + id, viewBox: '0 0 10 10', refX: 10, refY: 5, markerWidth: 8, markerHeight: 8, markerUnits: 'userSpaceOnUse', orient: 'auto-start-reverse' }, dd);
+    el('path', { d: 'M0,1.6 L10,5 L0,8.4 Z', class: 'arw' }, m);
+    const p = el('pattern', { id: 'h' + id, patternUnits: 'userSpaceOnUse', width: 6, height: 6, patternTransform: 'rotate(45)' }, dd);
+    el('line', { x1: 0, y1: 0, x2: 0, y2: 6, class: 'hatchln' }, p);
+    return { svg, dd, ar: `url(#a${id})`, hatch: `url(#h${id})` };
+  }
+  function clipRect(D, x, y, w, h) { const id = 'c' + (++uid); const cp = el('clipPath', { id }, D.dd); el('rect', { x: rd(x), y: rd(y), width: rd(w), height: rd(h) }, cp); return `url(#${id})`; }
+  function clipD(D, d) { const id = 'c' + (++uid); const cp = el('clipPath', { id }, D.dd); el('path', { d }, cp); return `url(#${id})`; }
+  const tw = s => s.length * 7 + 6;
+  function dimH(D, g, xa, xb, y, label, o = {}) {
+    let ya = o.ya, yb = o.yb ?? o.ya;
+    if (xa > xb) { [xa, xb] = [xb, xa]; [ya, yb] = [yb, ya]; }
+    const ext = (x, y0) => { if (y0 == null) return; const dir = y < y0 ? -1 : 1; line(g, x, y0 + dir * 2, x, y + dir * 4, 'ext'); };
+    ext(xa, ya); ext(xb, yb);
+    const len = xb - xa;
+    if (len >= 22) line(g, xa, y, xb, y, 'dim', { 'marker-start': D.ar, 'marker-end': D.ar });
+    else { line(g, xa - 12, y, xa, y, 'dim', { 'marker-end': D.ar }); line(g, xb + 12, y, xb, y, 'dim', { 'marker-end': D.ar }); line(g, xa, y, xb, y, 'dim'); }
+    if (len >= tw(label) + 16 && !o.side) txt(g, (xa + xb) / 2, y - 4, label, { 'text-anchor': 'middle', class: 'dt' });
+    else if (o.side === 'left') txt(g, xa - 16, y + 4, label, { 'text-anchor': 'end', class: 'dt' });
+    else txt(g, xb + 16, y + 4, label, { class: 'dt' });
+  }
+  function dimV(D, g, ya, yb, x, label, o = {}) {
+    let xa = o.xa, xb = o.xb ?? o.xa;
+    if (ya > yb) { [ya, yb] = [yb, ya]; [xa, xb] = [xb, xa]; }
+    const ext = (y, x0) => { if (x0 == null) return; const dir = x < x0 ? -1 : 1; line(g, x0 + dir * 2, y, x + dir * 4, y, 'ext'); };
+    ext(ya, xa); ext(yb, xb);
+    const len = yb - ya, mid = (ya + yb) / 2;
+    if (len >= 22) line(g, x, ya, x, yb, 'dim', { 'marker-start': D.ar, 'marker-end': D.ar });
+    else { line(g, x, ya - 10, x, ya, 'dim', { 'marker-end': D.ar }); line(g, x, yb + 10, x, yb, 'dim', { 'marker-end': D.ar }); line(g, x, ya, x, yb, 'dim'); }
+    if (len >= tw(label) + 12 && !o.side) txt(g, x - 5, mid, label, { 'text-anchor': 'middle', class: 'dt', transform: `rotate(-90 ${rd(x - 5)} ${rd(mid)})` });
+    else if (o.side === 'below') txt(g, x, yb + 24, label, { 'text-anchor': 'middle', class: 'dt' });
+    else txt(g, x + 6, mid + 4, label, { class: 'dt' });
+  }
+  function leader(D, g, px, py, tx, ty, label, anchor = 'start') {
+    const sh = anchor === 'start' ? 10 : -10;
+    el('path', { d: `M${rd(px)},${rd(py)} L${rd(tx)},${rd(ty)} L${rd(tx + sh)},${rd(ty)}`, class: 'dim', 'marker-start': D.ar }, g);
+    txt(g, tx + sh + (anchor === 'start' ? 3 : -3), ty + 4, label, { 'text-anchor': anchor, class: 'dt' });
+  }
+  function breakLine(g, x, yt, yb) {
+    const m = (yt + yb) / 2, a = Math.min(7, (yb - yt) / 6);
+    el('path', { d: `M${rd(x)},${rd(yt - 6)} L${rd(x)},${rd(m - a)} L${rd(x + a)},${rd(m - a / 3)} L${rd(x - a)},${rd(m + a / 3)} L${rd(x)},${rd(m + a)} L${rd(x)},${rd(yb + 6)}`, class: 'brk' }, g);
+  }
+  function title(g, x, y, t, sub, anchor = 'start') {
+    txt(g, x, y, t, { class: 'ttl', 'text-anchor': anchor });
+    if (sub) txt(g, x, y + 15, sub, { class: 'sb', 'text-anchor': anchor });
+  }
+
+  // mặt đứng một thành: X(x), Y(y) -> màn hình; phase = pha tâm vòm của thành này
+  function wallStrip(D, g, s, o) {
+    const { X, Y, xa, xb, phase } = o, P = s.P, ln = o.thin ? 'ln-s' : 'ln', k = Math.abs(X(1) - X(0));
+    const f = (x, y) => [X(x), Y(y)];
+    el('rect', { x: rd(X(xa)), y: rd(Y(s.H)), width: rd(X(xb) - X(xa)), height: rd(Y(0) - Y(s.H)), class: 'mat' }, g);
+    const cg = el('g', { 'clip-path': clipRect(D, X(xa), Y(s.H) - 3, X(xb) - X(xa), Y(0) - Y(s.H) + 6) }, g);
+    if (!o.thin) line(cg, X(xa), Y(s.H - s.ttop), X(xb), Y(s.H - s.ttop), 'hid');
+    const arches = positions(phase, P, xa - s.archW, xb + s.archW);
+    arches.forEach(c => { const pts = archPts(s, c); el('path', { d: pathOf(pts, f), class: 'hole' }, cg); el('path', { d: pathOf(pts, f, false), class: ln }, cg); });
+    if (s.d > 0) positions(phase + P / 2, P, xa - s.d, xb + s.d).forEach(h => el('circle', { cx: rd(X(h)), cy: rd(Y(s.yh)), r: rd(s.d / 2 * k), class: 'hole ' + ln }, cg));
+    line(g, X(xa), Y(s.H), X(xb), Y(s.H), ln);
+    complement(arches.map(c => [c - s.archW / 2, c + s.archW / 2]), xa, xb).forEach(([a, b]) => line(g, X(a), Y(0), X(b), Y(0), ln));
+    for (const x of [xa, xb]) {
+      if (o.ends === 'break') breakLine(g, X(x), Y(s.H), Y(0));
+      else complement(wallVoidsAt(s, x, phase), 0, s.H).forEach(([a, b]) => line(g, X(x), Y(a), X(x), Y(b), ln));
+    }
+  }
+  // mặt lưng nhìn từ trên: Z(zb) -> màn hình, zb = 0 là phía thành A
+  function topStrip(D, g, s, o) {
+    const { X, Z, xa, xb, phase } = o, ln = o.thin ? 'ln-s' : 'ln';
+    const f = (x, z) => [X(x), Z(z)];
+    el('rect', { x: rd(X(xa)), y: rd(Z(s.W)), width: rd(X(xb) - X(xa)), height: rd(Z(0) - Z(s.W)), class: 'mat' }, g);
+    const cg = el('g', { 'clip-path': clipRect(D, X(xa), Z(s.W) - 3, X(xb) - X(xa), Z(0) - Z(s.W) + 6) }, g);
+    for (const z of [s.tw, s.W - s.tw]) line(cg, X(xa), Z(z), X(xb), Z(z), 'hid');
+    if (s.slotW > 0) positions(phase, s.slotP, xa - s.slotL, xb + s.slotL).forEach(c => el('path', { d: pathOf(rrectPts(c, s.W / 2, s.slotL, s.slotW, rrOf(s)), f), class: 'hole ' + ln }, cg));
+    line(g, X(xa), Z(s.W), X(xb), Z(s.W), ln); line(g, X(xa), Z(0), X(xb), Z(0), ln);
+    for (const x of [xa, xb]) {
+      if (o.ends === 'break') breakLine(g, X(x), Z(s.W), Z(0));
+      else { const v = slotVoidAt(s, x, phase); complement(v ? [v] : [], 0, s.W).forEach(([a, b]) => line(g, X(x), Z(a), X(x), Z(b), ln)); }
+    }
+  }
+
+  // ---------- 1. tờ bản vẽ
+  function drawSheet(svg, s) {
+    svg.innerHTML = ''; const D = defs(svg), g = el('g', {}, svg);
+    const P = s.P, W = s.W, H = s.H, win = 2.5 * P, RX = 300, SL = 580, k = SL / win;
+    const r1 = 100, r1b = r1 + W * k, r2 = r1b + 96, r2b = r2 + H * k, r3 = r2b + 100, r3b = r3 + H * k, DB = 128;
+    const VH = Math.max(r3b + 34, r3 + DB + 20) + 8;
+    svg.setAttribute('viewBox', `0 0 1000 ${rd(VH)}`);
+    svg.dataset.k = k; svg.dataset.kd = DB / (3.2 * s.tw);      // tỷ lệ màn hình/mm (dùng khi xuất DXF)
+    const X = x => RX + x * k, ZT = z => r1b - z * k, YA = y => r2b - y * k, YB = y => r3b - y * k;
+    const ph = 0.5 * P, xE = X(win), rr = rrOf(s), R = archRof(s), c45 = Math.SQRT1_2;
+
+    // hình chiếu
+    topStrip(D, g, s, { X, Z: ZT, xa: 0, xb: win, phase: ph, ends: 'break' });
+    wallStrip(D, g, s, { X, Y: YA, xa: 0, xb: win, phase: ph, ends: 'break' });
+    wallStrip(D, g, s, { X, Y: YB, xa: 0, xb: win, phase: ph + P / 2, ends: 'break' });
+
+    // đường tâm
+    for (const c of [0.5 * P, 1.5 * P]) line(g, X(c), r1 - 6, X(c), r3b + 8, 'ctr');
+    for (const c of [P, 2 * P]) line(g, X(c), r2 - 6, X(c), r3b + 8, 'ctr');
+    line(g, X(0) - 8, ZT(W / 2), xE + 8, ZT(W / 2), 'ctr');
+    if (s.d > 0) {
+      const e = s.d / 2 * k + 7;
+      for (const c of [P, 2 * P]) line(g, X(c) - e, YA(s.yh), X(c) + e, YA(s.yh), 'ctr');
+      for (const c of [0.5 * P, 1.5 * P]) line(g, X(c) - e, YB(s.yh), X(c) + e, YB(s.yh), 'ctr');
+    }
+
+    // tiêu đề
+    const slotTxt = s.slotType === 'oval' ? T(`oval (hai đầu R${nf(s.slotW / 2)})`, `obround (R${nf(s.slotW / 2)} ends)`) : T(`chữ nhật bo góc R${nf(rr)}`, `rounded rectangle R${nf(rr)}`);
+    title(g, RX, r1 - 74, T('HÌNH CHIẾU BẰNG — BỤNG', 'TOP VIEW — WEB'), T(`Lỗ bụng ${nf(s.slotL)} × ${nf(s.slotW)} ${slotTxt} · đồng tâm lỗ vòm cánh A · mép dưới là phía cánh A`, `Web slot ${nf(s.slotL)} × ${nf(s.slotW)} ${slotTxt} · concentric with flange A arch openings · lower edge = flange A side`));
+    title(g, RX, r2 - 72, T('HÌNH CHIẾU ĐỨNG — CÁNH A', 'FRONT ELEVATION — FLANGE A'), T(`Lỗ vòm ${nf(s.archW)} × ${nf(s.archH)} xen lỗ tròn Ø${nf(s.d)}, bước P = ${nf(P)}`, `Arch opening ${nf(s.archW)} × ${nf(s.archH)} alternating with round hole Ø${nf(s.d)}, pitch P = ${nf(P)}`));
+    title(g, RX, r3 - 60, T('HÌNH CHIẾU ĐỨNG — CÁNH B (nhìn từ phía cánh A)', 'ELEVATION — FLANGE B (seen from flange A side)'), T(`Lỗ như cánh A, so le ${nf(P / 2)} mm (P/2)`, `Same holes as flange A, staggered ${nf(P / 2)} mm (P/2)`));
+
+    // kích thước — lưng
+    const c1 = 1.5 * P;
+    dimH(D, g, X(c1 - s.slotL / 2), X(c1 + s.slotL / 2), r1 - 16, nf(s.slotL), { ya: ZT(W / 2) });
+    dimV(D, g, ZT(W / 2 + s.slotW / 2), ZT(W / 2 - s.slotW / 2), xE + 24, nf(s.slotW), { xa: xE + 2 });
+    dimV(D, g, ZT(W), ZT(0), xE + 50, nf(W), { xa: xE + 2 });
+    {
+      const px = 0.5 * P + s.slotL / 2 - rr + rr * c45, pz = W / 2 + s.slotW / 2 - rr + rr * c45;
+      leader(D, g, X(px), ZT(pz), X(0.5 * P + s.slotL / 2) + 26, r1 - 40, 'R' + nf(rr));
+    }
+    // kích thước — thành A
+    dimH(D, g, X(0.5 * P), X(1.5 * P), r2 - 34, 'P = ' + nf(P), {});
+    dimH(D, g, X(0.5 * P), X(P), r2 - 14, nf(P / 2), {});
+    dimH(D, g, X(0.5 * P - s.archW / 2), X(0.5 * P + s.archW / 2), r2b + 22, nf(s.archW), { ya: YA(0) });
+    if (s.d > 0) dimV(D, g, YA(s.yh), YA(0), xE + 24, nf(s.yh), { xa: X(2 * P) + s.d / 2 * k, xb: xE + 2 });
+    dimV(D, g, YA(s.archH), YA(0), xE + 50, nf(s.archH), { xa: X(c1 + s.archW / 2 - R), xb: xE + 2 });
+    dimV(D, g, YA(H), YA(0), xE + 76, nf(H), { xa: xE + 2, xb: xE + 2 });
+    if (s.d > 0) { const rr2 = s.d / 2 * k; leader(D, g, X(2 * P) + rr2 * c45, YA(s.yh) - rr2 * c45, X(2 * P) + rr2 + 30, r2 - 24, 'Ø' + nf(s.d)); }
+    {
+      const px = c1 + s.archW / 2 - R + R * c45, py = s.archH - R + R * c45;
+      leader(D, g, X(px), YA(py), X(c1 + s.archW / 2) - 10, YA(s.archH * 0.34), 'R' + nf(R), 'end');
+    }
+    // kích thước — thành B
+    dimH(D, g, X(0.5 * P), X(P), r3 - 16, T('so le ', 'stagger ') + nf(P / 2), {});
+
+    // mặt cắt biên dạng (gióng với thành A)
+    const CX = 150, SX = z => CX + z * k, sf = (z, y) => [SX(z), YA(y)];
+    title(g, CX, r2 - 72, T('MẶT CẮT NGANG', 'CROSS-SECTION'), T('cùng tỷ lệ hình chiếu đứng', 'same scale as the elevation'), 'middle');
+    const dP = pathOf(profilePts(s), sf);
+    el('path', { d: dP, class: 'mat' }, g); el('path', { d: dP, fill: D.hatch }, g); el('path', { d: dP, class: 'ln' }, g);
+    dimH(D, g, SX(-W / 2), SX(W / 2), r2 - 16, nf(W), { ya: YA(H) });
+    dimV(D, g, YA(H), YA(0), SX(-W / 2) - 18, nf(H), { xa: SX(-W / 2) });
+    dimH(D, g, SX(-W / 2), SX(-W / 2 + s.tw), r2b + 22, nf(s.tw), { ya: YA(0), side: 'left' });
+    dimV(D, g, YA(H), YA(H - s.ttop), SX(W / 4), nf(s.ttop), { side: 'below' });
+    txt(g, SX(-W / 2 + s.tw / 2), r2b + 50, T('CÁNH A', 'FLANGE A'), { class: 'tag', 'text-anchor': 'middle' });
+    txt(g, SX(W / 2 - s.tw / 2), r2b + 50, T('CÁNH B', 'FLANGE B'), { class: 'tag', 'text-anchor': 'middle' });
+    const cI = [SX(-W / 2 + s.tw), YA(H - s.ttop)], rI = Math.max(12, 1.4 * s.tw * k);
+    el('circle', { cx: rd(cI[0]), cy: rd(cI[1]), r: rd(rI), class: 'callout' }, g);
+    txt(g, cI[0] + rI * 0.75 + 3, cI[1] + rI * 0.75 + 12, 'I', { class: 'tag' });
+    const cII = [SX(-W / 2 + s.tw / 2), YA(0)], rII = Math.max(10, 1.1 * s.tw * k);
+    el('circle', { cx: rd(cII[0]), cy: rd(cII[1]), r: rd(rII), class: 'callout' }, g);
+    txt(g, cII[0] + rII + 4, cII[1] - rII + 4, 'II', { class: 'tag' });
+
+    // chi tiết I, II
+    const span = 3.2 * s.tw, kd = DB / span, dpts = profilePts(s, 16);
+    const detail = (bx, by, z0, y1, name, sub, extra) => {
+      const DX = z => bx + (z - z0) * kd, DY = y => by + (y1 - y) * kd, f = (z, y) => [DX(z), DY(y)];
+      txt(g, bx, by - 22, name, { class: 'ttl' }); txt(g, bx, by - 8, sub, { class: 'sb' });
+      el('rect', { x: bx, y: by, width: DB, height: DB, rx: 4, class: 'dbox' }, g);
+      const cg = el('g', { 'clip-path': clipRect(D, bx, by, DB, DB) }, g), d = pathOf(dpts, f);
+      el('path', { d, class: 'mat' }, cg); el('path', { d, fill: D.hatch }, cg); el('path', { d, class: 'ln' }, cg);
+      extra(DX, DY, bx, by);
+    };
+    const zoomTxt = ` · ×${nf(kd / k)}`;
+    detail(12, r3, -W / 2 - 0.5 * s.tw, H + 0.5 * s.tw, T('HÌNH TRÍCH I', 'DETAIL I'), T('vát góc trong 45°', 'inner chamfer 45°') + zoomTxt,(DX, DY, bx, by) => {
+      dimH(D, g, DX(-W / 2), DX(-W / 2 + s.tw), by + DB - 14, nf(s.tw), {});
+      dimV(D, g, DY(H), DY(H - s.ttop), DX(-W / 2 + 2.0 * s.tw), nf(s.ttop), {});
+      const zc = -W / 2 + s.tw + s.chamfer / 2, yc = H - s.ttop - s.chamfer / 2;
+      leader(D, g, DX(zc), DY(yc), bx + 120, by + 94, `${nf(s.chamfer)}×45°`, 'end');
+    });
+    detail(150, r3, -W / 2 - 0.5 * s.tw, 2.7 * s.tw, T('HÌNH TRÍCH II', 'DETAIL II'), T('bo mép chân cánh', 'flange foot radius') + zoomTxt,(DX, DY, bx, by) => {
+      const rf = Math.min(s.footR, s.tw / 2), ex = bx + 100, ey = by + 46;
+      leader(D, g, DX(-W / 2 + rf - rf * c45), DY(rf - rf * c45), ex, ey, 'R' + nf(rf, 2));
+      el('path', { d: `M${rd(DX(-W / 2 + s.tw - rf + rf * c45))},${rd(DY(rf - rf * c45))} L${rd(ex)},${rd(ey)}`, class: 'dim', 'marker-start': D.ar }, g);
+      line(g, bx + 4, DY(0), bx + DB - 4, DY(0), 'hid');
+      txt(g, bx + DB - 6, DY(0) + 15, T('mặt ván khuôn', 'formwork face'), { class: 'sb', 'text-anchor': 'end' });
+    });
+
+    // ký hiệu
+    txt(g, 20, r1 - 74, T('KÝ HIỆU NÉT', 'LINE TYPES'), { class: 'ttl' });
+    [['ln', T('Đường bao thấy', 'Visible outline')], ['hid', T('Đường bao khuất', 'Hidden outline')], ['ctr', T('Đường tâm', 'Centre line')], ['dim', T('Đường kích thước (mm)', 'Dimension line (mm)')]].forEach(([c, t], i) => {
+      const y = r1 - 46 + i * 22;
+      line(g, 20, y, 62, y, c, c === 'dim' ? { 'marker-start': D.ar, 'marker-end': D.ar } : {});
+      txt(g, 72, y + 4, t);
+    });
+    { const y = r1 - 46 + 4 * 22; el('rect', { x: 20, y: y - 7, width: 42, height: 14, class: 'mat' }, g); el('rect', { x: 20, y: y - 7, width: 42, height: 14, fill: D.hatch }, g); el('rect', { x: 20, y: y - 7, width: 42, height: 14, class: 'ln-s' }, g); txt(g, 72, y + 4, T('Ký hiệu vật liệu mặt cắt', 'Section hatching')); }
+    { const y = r1 - 46 + 5 * 22; breakLine(g, 41, y - 7, y + 7); txt(g, 72, y + 4, T('Đường cắt lìa', 'Break line')); }
+
+    svg.setAttribute('aria-label', LANG === 'en' ? `Drawing H${H}: section ${W}×${H}, flange ${s.tw}, web ${s.ttop}, chamfer ${s.chamfer}×45°, foot R${s.footR}; flange A arch ${s.archW}×${s.archH} R${R}, round hole Ø${s.d} at ${s.yh}, pitch ${P}; flange B staggered ${P / 2}; web slot ${s.slotL}×${s.slotW}` : `Bản vẽ H${H}: mặt cắt ${W}×${H}, cánh ${s.tw}, bụng ${s.ttop}, vát ${s.chamfer}×45°, chân R${s.footR}; cánh A lỗ vòm ${s.archW}×${s.archH} R${R}, lỗ tròn Ø${s.d} tâm cao ${s.yh}, bước ${P}; cánh B so le ${P / 2}; lỗ bụng ${s.slotL}×${s.slotW}`);
+  }
+
+  // ---------- 2. thanh cắt ngẫu nhiên
+  let bars = [], selBar = 0;
+  const eRight = (s, e) => +((((L - e) % s.P) + s.P) % s.P).toFixed(2);
+  const randE = s => Math.floor(Math.random() * s.P * 2) / 2;
+  function newBars(s) { bars = [0, 1, 2].map(() => ({ e: randE(s) })); selBar = 0; }
+
+  function drawOverview(svg, s) {
+    svg.innerHTML = ''; const D = defs(svg), g = el('g', {}, svg);
+    const x0 = 56, x1 = 944, ko = (x1 - x0) / L, hb = s.H * ko, top = 46, rowH = hb + 62;
+    svg.setAttribute('viewBox', `0 0 1000 ${rd(top + 3 * rowH + 4)}`);
+    dimH(D, g, x0, x1, 24, `${nf(L, 0)} ${T('(chiều dài cắt)', '(cut length)')}`, { ya: top + 30 });
+    bars.forEach((b, i) => {
+      const yb = top + i * rowH, on = i === selBar;
+      const grp = el('g', { class: 'barrow', tabindex: 0, role: 'button', 'aria-pressed': on, 'aria-label': T(`Thanh ${i + 1}: đầu trái e = ${nf(b.e)} mm, đầu phải e = ${nf(eRight(s, b.e))} mm`, `Bar ${i + 1}: left end e = ${nf(b.e)} mm, right end e = ${nf(eRight(s, b.e))} mm`) }, g);
+      el('rect', { x: 8, y: yb, width: 984, height: rowH - 8, rx: 8, class: on ? 'selbg' : 'rowbg' }, grp);
+      txt(grp, x0, yb + 20, T(`Thanh ${i + 1}`, `Bar ${i + 1}`), { class: 'ttl' });
+      txt(grp, x0 + 78, yb + 20, T(`đầu trái e = ${nf(b.e)} mm · đầu phải e = ${nf(eRight(s, b.e))} mm`, `left end e = ${nf(b.e)} mm · right end e = ${nf(eRight(s, b.e))} mm`), { class: 'sb' });
+      const Y = y => yb + 30 + hb - y * ko;
+      wallStrip(D, grp, s, { X: x => x0 + x * ko, Y, xa: 0, xb: L, phase: b.e, ends: 'cut', thin: true });
+      txt(grp, x0 - 8, Y(s.H / 2) + 4, T('trái', 'left'), { class: 'sb', 'text-anchor': 'end' });
+      txt(grp, x1 + 8, Y(s.H / 2) + 4, T('phải', 'right'), { class: 'sb' });
+      const pick = () => { selBar = i; renderCut(false); };
+      grp.addEventListener('click', pick);
+      grp.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); svg.querySelectorAll('.barrow')[i]?.focus(); } });
+    });
+    svg.setAttribute('aria-label', T(`3 thanh dài ${L} mm cắt ngẫu nhiên, hình chiếu đứng cánh A`, `3 bars of ${L} mm cut at random, flange A elevation`));
+  }
+
+
+  function renderCut() {
+    const s = S[cur], b = bars[selBar], eR = eRight(s, b.e);
+    drawOverview($('d-over'), s);
+    const rg = $('rng'); rg.max = s.P - 0.5; rg.value = b.e;
+    $('rng-out').textContent = nf(b.e) + ' mm'; $('rng-bar').textContent = selBar + 1;
+    renderCutKpis(s, b, eR);
+    document.dispatchEvent(new CustomEvent('kh-change'));
+  }
+  // cầu nối cho module 3D / DXF (script đóng gói bên dưới)
+  window.KH = { state: () => ({ s: S[cur], e: bars[selBar].e, eR: eRight(S[cur], bars[selBar].e), bar: selBar + 1, L, date: DATA.date, lang: LANG }) };
+  $('rng').addEventListener('input', e => { bars[selBar].e = +e.target.value; renderCut(); });
+  $('btn-rand').addEventListener('click', () => { newBars(S[cur]); renderCut(); });
+
+  // ---------- số liệu dẫn xuất
+  const neck = s => s.H - s.ttop - s.archH;                     // đỉnh vòm -> mặt trong lưng
+  const bridge = s => s.P / 2 - s.archW / 2 - s.d / 2;          // cầu nhựa giữa vòm và lỗ tròn
+  const holeTop = s => s.H - s.ttop - (s.yh + s.d / 2);          // đỉnh lỗ tròn -> mặt dưới bụng
+  const holeBot = s => s.yh - s.d / 2;                           // đáy lỗ tròn -> mặt ván khuôn
+  const slotGap = s => s.slotP - s.slotL;                        // khoảng cách giữa 2 lỗ bụng
+  // mọi khoảng cách mép lỗ, kèm tên hiển thị [vi, en, câu vi, câu en]
+  const EDGES = [
+    [neck, 'đỉnh lỗ vòm → bụng', 'arch crown → web', 'từ đỉnh lỗ vòm tới mặt dưới bụng', 'from the arch crown to the web underside'],
+    [bridge, 'lỗ vòm ↔ lỗ tròn', 'arch ↔ round hole', 'giữa lỗ vòm và lỗ tròn', 'between the arch opening and the round hole'],
+    [holeTop, 'đỉnh lỗ tròn → bụng', 'round hole → web', 'từ đỉnh lỗ tròn tới mặt dưới bụng', 'from the round hole to the web underside'],
+    [holeBot, 'đáy lỗ tròn → mặt ván', 'round hole → formwork', 'từ đáy lỗ tròn tới mặt ván khuôn', 'from the round hole to the formwork face'],
+    [slotGap, 'giữa 2 lỗ bụng', 'between web slots', 'giữa hai lỗ bụng', 'between two web slots'],
+  ];
+  const minEdge = s => EDGES.map(e => [e[0](s), e]).reduce((a, b) => (b[0] < a[0] ? b : a));
+  const minBridge = s => minEdge(s)[0];
+  const STATS = S.map(endStats);                                 // tỷ lệ đầu thanh có lỗ hở / mép mỏng, mỗi cỡ
+  const pct = x => Math.round(x * 100) + '%';
+  const mm = (x, d = 1) => `${nf(x, d)}<small>mm</small>`;
+  const kpiHTML = (k, v, sub, flag) => `<div class="kpi"><div class="k">${k}</div><div class="v">${v}</div>${sub ? `<div class="s${flag ? ' flag' : ''}">${sub}</div>` : ''}</div>`;
+
+  function renderKpis(s) {
+    const nk = neck(s), br = bridge(s), mb = minBridge(s), thin = mb < s.tw;
+    $('kpis').innerHTML = [
+      kpiHTML(T('Kích thước W × H', 'Size W × H'), `${nf(s.W)} × ${nf(s.H)}<small>mm</small>`, T('H = chiều dày lớp bê tông bảo vệ', 'H = concrete cover')),
+      kpiHTML(T('Chiều dày cánh / bụng', 'Flange / web thickness'), `${nf(s.tw)} / ${nf(s.ttop)}<small>mm</small>`, T(`vát góc trong ${nf(s.chamfer)} × 45°`, `inner chamfer ${nf(s.chamfer)} × 45°`)),
+      kpiHTML(T('Bước lỗ P', 'Hole pitch P'), mm(s.P), T(`hai cánh so le ${nf(s.P / 2)} mm`, `flanges staggered ${nf(s.P / 2)} mm`)),
+      kpiHTML(T('Khoảng cách mép lỗ nhỏ nhất', 'Min. edge distance'), mm(mb), thin ? T(`nhỏ hơn chiều dày cánh ${nf(s.tw)} mm`, `below flange thickness ${nf(s.tw)} mm`) : T(minEdge(s)[1][1], minEdge(s)[1][2]), thin),
+      kpiHTML(T('Tỷ lệ lỗ trên cánh', 'Flange open area'), `${nf(s.open, 0)}<small>%</small>`, T('diện tích lỗ / diện tích cánh', 'hole area / flange area')),
+    ].join('');
+  }
+  function renderCutKpis(s, b, eR) {
+    const st = STATS[cur];
+    $('kpis-cut').innerHTML = [
+      kpiHTML(T('Đầu thanh có lỗ bị cắt hở', 'Bar ends with a hole cut open'), `${pct(st.cut)}`, T('lỗ vòm, lỗ tròn hoặc lỗ bụng', 'arch opening, round hole or web slot')),
+      kpiHTML(T('Đầu thanh có dải nhựa hẹp', 'Bar ends with a narrow strip'), `${pct(st.thin)}`, T(`hẹp hơn chiều dày cánh ${nf(s.tw)} mm`, `narrower than the flange, ${nf(s.tw)} mm`), st.thin > 0.3),
+      kpiHTML(T('Bước lỗ P', 'Hole pitch P'), mm(s.P), T(`chiều dài cắt ${nf(L, 0)} mm`, `cut length ${nf(L, 0)} mm`)),
+      kpiHTML(T(`Thanh ${selBar + 1} · e trái / phải`, `Bar ${selBar + 1} · e left / right`), `${nf(b.e)} / ${nf(eR)}<small>mm</small>`, T('tới tâm lỗ vòm cánh A gần nhất', 'to nearest flange A arch centre')),
+    ].join('');
+  }
+
+  function renderSpecs(s) {
+    $('t-code').textContent = s.code; $('t3-code').textContent = s.code;
+    $('t-size').textContent = T(`Thanh kê chữ U ${nf(s.W)} × ${nf(s.H)} mm`, `U-channel spacer ${nf(s.W)} × ${nf(s.H)} mm`);
+    const nk = neck(s), br = bridge(s);
+    const f = $('t-finding');
+    if (minBridge(s) < s.tw) f.innerHTML = T(`<span class="flag">Đỉnh lỗ vòm chỉ cách mặt dưới bụng ${nf(nk)} mm</span>, nhỏ hơn chiều dày cánh ${nf(s.tw)} mm; dải nhựa này dễ nứt khi dập.`, `<span class="flag">The arch crown is only ${nf(nk)} mm below the web underside</span>, less than the flange thickness ${nf(s.tw)} mm; this strip may crack during punching.`);
+    else f.innerHTML = T(`Khoảng cách mép lỗ đều không nhỏ hơn chiều dày cánh ${nf(s.tw)} mm; nhỏ nhất <b>${nf(minBridge(s))} mm</b> ${minEdge(s)[1][3]}.`, `All edge distances are at least the flange thickness ${nf(s.tw)} mm; the minimum is <b>${nf(minBridge(s))} mm</b> ${minEdge(s)[1][4]}.`);
+    renderKpis(s);
+    const tb = $('tblock'); tb.innerHTML = '';
+    [[T('Sản phẩm', 'Product'), T('Thanh kê PVC chữ U', 'PVC U-channel rebar spacer')], [T('Mã', 'Code'), s.code], [T('Cỡ W × H', 'Size W × H'), `${nf(s.W)} × ${nf(s.H)} mm`], [T('Vật liệu', 'Material'), T('uPVC tái chế', 'Recycled uPVC')],
+     [T('Công nghệ', 'Process'), T('Đùn ép profile, dập lỗ liên tục', 'Profile extrusion, continuous punching'), 'wide'], [T('Chiều dài thanh', 'Bar length'), T(`${nf(L, 0)} mm, vị trí lỗ ở đầu thanh ngẫu nhiên`, `${nf(L, 0)} mm, random hole position at bar ends`), 'wide'],
+     [T('Đơn vị', 'Units'), 'mm'], [T('Trạng thái', 'Status'), T('Bản duyệt thiết kế', 'Design review issue')], [T('Ngày lập', 'Date'), DATA.date], [T('Dung sai', 'Tolerances'), T('Chờ thống nhất', 'To be agreed')]].forEach(([k, v, cls]) => {
+      const d = document.createElement('div'); if (cls) d.className = cls;
+      d.innerHTML = '<div class="k"></div><div class="v"></div>'; d.children[0].textContent = k; d.children[1].textContent = v; tb.appendChild(d);
+    });
+    const rr = rrOf(s), sp = $('specs'); sp.innerHTML = '';
+    [[T('Kích thước W × H', 'Size W × H'), `${nf(s.W)} × ${nf(s.H)} mm`], [T('Chiều dày cánh / bụng', 'Flange / web thickness'), `${nf(s.tw)} / ${nf(s.ttop)} mm`],
+     [T('Vát góc trong / bo mép chân', 'Inner chamfer / foot radius'), `${nf(s.chamfer)} × 45° / R${nf(s.footR)}`], [T('Lỗ vòm (rộng × cao)', 'Arch opening (w × h)'), `${nf(s.archW)} × ${nf(s.archH)} mm, R${nf(archRof(s))}`],
+     [T('Lỗ tròn', 'Round hole'), T(`Ø${nf(s.d)}, tâm cao ${nf(s.yh)} mm`, `Ø${nf(s.d)}, centre height ${nf(s.yh)} mm`)], [T('Bước lỗ P / so le', 'Hole pitch P / stagger'), `${nf(s.P)} / ${nf(s.P / 2)} mm`],
+     [T('Lỗ bụng', 'Web slot'), `${nf(s.slotL)} × ${nf(s.slotW)} mm, ${s.slotType === 'oval' ? T('oval', 'obround') : T('bo góc R', 'corner R') + nf(rr)}`], [T('Tỷ lệ lỗ trên cánh', 'Flange open area'), `${nf(s.open, 0)}%`],
+     [T('Đỉnh lỗ vòm → mặt dưới bụng', 'Arch crown → web underside'), `${nf(nk)} mm`, nk < s.tw], [T('Mép lỗ vòm → mép lỗ tròn', 'Arch edge → round hole edge'), `${nf(br)} mm`, br < s.tw],
+     [T('Đỉnh lỗ tròn → mặt dưới bụng', 'Round hole → web underside'), `${nf(holeTop(s))} mm`, holeTop(s) < s.tw], [T('Đáy lỗ tròn → mặt ván', 'Round hole → formwork face'), `${nf(holeBot(s))} mm`, holeBot(s) < s.tw],
+     [T('Mép lỗ bụng → mép ngoài', 'Web slot edge → outer edge'), `${nf((s.W - s.slotW) / 2)} mm`], [T('Khoảng cách 2 lỗ bụng', 'Gap between web slots'), `${nf(s.slotP - s.slotL)} mm`]].forEach(([k, v, w]) => {
+      const row = document.createElement('div');
+      row.innerHTML = '<dt></dt><dd></dd>'; row.children[0].textContent = k; row.children[1].textContent = v;
+      if (w) { const p = document.createElement('span'); p.className = 'pill warn'; p.style.marginLeft = '8px'; p.textContent = T('nhỏ hơn chiều dày cánh', 'below flange thickness'); row.children[1].appendChild(p); }
+      sp.appendChild(row);
+    });
+  }
+
+  // ---------- biểu đồ (charts.js, vẽ lại khi đổi cỡ / giao diện)
+  const fresh = host => { host.innerHTML = ''; const d = document.createElement('div'); host.appendChild(d); return d; };
+  function renderCharts() {
+    if (!window.Charts) return;
+    const labels = S.map(s => 'H' + s.H);
+    Charts.bars(fresh($('ch-thin')), { labels, values: STATS.map(x => x.thin), highlight: cur, height: 200,
+      format: Charts.fmt.pct(0), tickFormat: Charts.fmt.pct(0) });
+    const worst = STATS.reduce((m, x, i) => x.thin > STATS[m].thin ? i : m, 0);
+    $('ch-thin-note').textContent = T(`H${S[cur].H}: ${pct(STATS[cur].thin)} số đầu thanh có dải nhựa hẹp hơn chiều dày cánh. Cao nhất là H${S[worst].H} (${pct(STATS[worst].thin)}).`, `H${S[cur].H}: ${pct(STATS[cur].thin)} of bar ends have a strip narrower than the flange thickness. Highest: H${S[worst].H} (${pct(STATS[worst].thin)}).`);
+    Charts.bars(fresh($('ch-bridge')), { labels, values: S.map(s => +(minBridge(s) / s.tw).toFixed(2)), highlight: cur, height: 220,
+      format: v => nf2(v) + T(' lần', '×'), tickFormat: v => nf(v, 1), reference: { value: 1, label: T('bằng chiều dày cánh', 'equal to flange thickness') } });
+  }
+
+  // ---------- chọn cỡ (bộ lọc chung ở thanh trên)
+  let cur = 0;
+  const tabs = $('tabs');
+  S.forEach((s, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'radio'); b.textContent = 'H' + s.H;
+    b.title = `${s.code} · ${nf(s.W)} × ${nf(s.H)} mm`;
+    b.addEventListener('click', () => select(i));
+    b.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); select((cur + (e.key === 'ArrowRight' ? 1 : S.length - 1)) % S.length); tabs.children[cur].focus(); } });
+    tabs.appendChild(b);
+  });
+  function select(i) {
+    cur = i; const s = S[i];
+    drawSheet($('d-sheet'), s); renderSpecs(s); newBars(s); renderCut(); renderCharts();
+    [...tabs.children].forEach((t, j) => { t.setAttribute('aria-checked', j === cur); t.tabIndex = j === cur ? 0 : -1; });
+    renderTable();
+    try { localStorage.setItem('kh-size', String(s.H)); } catch (e) {}
+  }
+
+  // ---------- bảng so sánh (lọc: tất cả / cần lưu ý)
+  let filter = 'all';
+  const flagged = s => minBridge(s) < s.tw;
+  function renderTable() {
+    const sb = $('sum-body'); sb.innerHTML = '';
+    const rows = S.map((s, i) => [s, i]).filter(([s]) => filter === 'all' || flagged(s));
+    rows.forEach(([s, i]) => {
+      const tr = document.createElement('tr'); tr.tabIndex = 0; tr.title = T(`Mở bản vẽ H${s.H}`, `Open drawing H${s.H}`);
+      if (i === cur) tr.className = 'on';
+      const cells = [[`H${s.H}`, 'l'], [`${nf(s.W)} × ${nf(s.H)}`], [`${nf(s.tw)} / ${nf(s.ttop)}`], [`${nf(s.chamfer)} × 45°`],
+        [`${nf(s.archW)} × ${nf(s.archH)}, R${nf(archRof(s))}`], [`Ø${nf(s.d)} · ${nf(s.yh)}`], [`${nf(s.P)} / ${nf(s.P / 2)}`],
+        [`${nf(s.slotL)} × ${nf(s.slotW)} ${s.slotType === 'oval' ? 'oval' : 'R' + nf(rrOf(s))}`, 'l'],
+        [nf(neck(s)), '', neck(s) < s.tw], [nf(bridge(s)), '', bridge(s) < s.tw], [`${nf(s.open, 0)}%`]];
+      cells.forEach(([v, cls, w], j) => {
+        const td = document.createElement(j ? 'td' : 'th'); if (!j) td.scope = 'row';
+        if (cls) td.className = cls;
+        td.textContent = v;
+        if (w) { const p = document.createElement('span'); p.className = 'pill warn'; p.textContent = T('hẹp', 'narrow'); td.appendChild(p); }
+        tr.appendChild(td);
+      });
+      tr.addEventListener('click', () => { select(i); location.hash = '#ban-ve'; });
+      tr.addEventListener('keydown', e => { if (e.key === 'Enter') tr.click(); });
+      sb.appendChild(tr);
+    });
+    $('tbl-empty').hidden = rows.length > 0;
+    $('tbl-count').textContent = filter === 'all' ? T(`${S.length} cỡ`, `${S.length} sizes`) : T(`${rows.length} / ${S.length} cỡ cần lưu ý`, `${rows.length} of ${S.length} sizes need attention`);
+  }
+  document.querySelectorAll('[data-filter]').forEach(b => b.addEventListener('click', () => {
+    filter = b.dataset.filter;
+    document.querySelectorAll('[data-filter]').forEach(x => x.setAttribute('aria-pressed', x === b));
+    renderTable();
+  }));
+  const flg = S.filter(flagged);
+  const ratio = s => minBridge(s) / s.tw;
+  const thinnest = S.reduce((m, s) => ratio(s) < ratio(m) ? s : m, S[0]);
+  function renderCmpFinding() {
+    const list = flg.map(s => 'H' + s.H).join(', ');
+    $('cmp-finding').textContent = flg.length
+      ? T(`${list} có khoảng cách mép lỗ nhỏ hơn chiều dày cánh; các cỡ còn lại đạt từ ${nf(Math.min(...S.filter(s => !flagged(s)).map(ratio)), 1)} lần chiều dày cánh trở lên.`,
+          `${list} have an edge distance below the flange thickness; the other sizes reach at least ${nf(Math.min(...S.filter(s => !flagged(s)).map(ratio)), 1)}× the flange thickness.`)
+      : T(`Mọi cỡ có khoảng cách mép lỗ không nhỏ hơn chiều dày cánh. Sát nhất là H${thinnest.H}: ${nf(minBridge(thinnest))} mm, bằng ${nf2(ratio(thinnest))} lần chiều dày cánh.`,
+          `Every size has an edge distance of at least the flange thickness. Tightest: H${thinnest.H}, ${nf(minBridge(thinnest))} mm, ${nf2(ratio(thinnest))}× the flange thickness.`);
+  }
+
+  // ---------- duyệt thiết kế: đánh dấu lưu trong trình duyệt của người xem
+  const items = () => {
+    const out = [
+      ['bien-dang', T('Mặt cắt ngang', 'Cross-section'), T('W × H, chiều dày cánh và bụng, vát góc trong 45°, bo mép chân R0,5 của từng cỡ.', 'W × H, flange and web thickness, 45° inner chamfer and R0.5 foot radius of each size.')],
+      ['lo-thanh', T('Lỗ trên cánh', 'Flange holes'), T('Lỗ vòm xen lỗ tròn, bước P; hai cánh so le P/2.', 'Arch openings alternating with round holes at pitch P; flanges staggered by P/2.')],
+      ['lo-lung', T('Lỗ bụng', 'Web slots'), T('Kích thước, kiểu bo góc / oval, đồng tâm lỗ vòm cánh A.', 'Size, rounded / obround shape, concentric with the flange A arch openings.')],
+      ['dau-thanh', T('Đầu thanh', 'Bar ends'), T('Lỗ dập liên tục nên lỗ ở hai đầu thanh có thể bị cắt hở; không có đoạn đặc ở đầu thanh.', 'Holes are punched continuously, so holes at both bar ends may be cut open; there is no solid zone at the ends.')],
+      ['dung-sai', T(`Chiều dài thanh ${nf(L, 0)} mm và dung sai`, `Bar length ${nf(L, 0)} mm and tolerances`), T('Dung sai chiều dài thanh, bước lỗ P và kích thước lỗ.', 'Tolerances on bar length, hole pitch P and hole sizes.')],
+    ];
+    if (flg.length) out.push(['co-vom', T(`Đỉnh lỗ vòm ${flg.map(s => 'H' + s.H).join(', ')}`, `Arch crown ${flg.map(s => 'H' + s.H).join(', ')}`),
+      T(`Chỉ cách mặt dưới bụng ${flg.map(s => nf(neck(s)) + ' mm').join(', ')}, nhỏ hơn chiều dày cánh; chấp nhận hoặc yêu cầu sửa.`, `Only ${flg.map(s => nf(neck(s)) + ' mm').join(', ')} below the web underside, less than the flange thickness; accept or request a change.`)]);
+    // lỗ tròn cao hơn đỉnh lỗ vòm (bộ đề xuất theo KUM, 23/11/2026) — lệch quy tắc "đỉnh vòm ngang đỉnh lỗ tròn" khách chọn trước đó
+    const up = S.filter(s => s.yh + s.d / 2 > s.archH + 0.05);
+    if (up.length) out.push(['lo-tron-cao', T(`Lỗ tròn cao hơn lỗ vòm: ${up.map(s => 'H' + s.H).join(', ')}`, `Round hole above arch crown: ${up.map(s => 'H' + s.H).join(', ')}`),
+      T(`Lỗ vòm hạ thấp để tăng sức chịu tải, lỗ tròn giữ kích thước nên đỉnh lỗ tròn cao hơn đỉnh lỗ vòm (${up.map(s => `H${s.H}: ${nf(s.yh + s.d / 2)} / ${nf(s.archH)} mm`).join('; ')}). Xác nhận bỏ quy tắc "đỉnh lỗ vòm ngang đỉnh lỗ tròn".`,
+        `Arch openings were lowered for load capacity while the round holes kept their size, so the round hole tops sit above the arch crowns (${up.map(s => `H${s.H}: ${nf(s.yh + s.d / 2)} / ${nf(s.archH)} mm`).join('; ')}). Confirm dropping the "arch crown level with round hole top" rule.`)]);
+    return out;
+  };
+  const store = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
+  let checked = store.get('kh-review', {});
+  const ul = $('review');
+  items().forEach(([id]) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<input type="checkbox" id="rv-${id}"><label for="rv-${id}"><b></b><span></span></label>`;
+    const cb = li.querySelector('input'); cb.checked = !!checked[id];
+    cb.addEventListener('change', () => { checked[id] = cb.checked; store.set('kh-review', checked); renderReview(); });
+    ul.appendChild(li);
+  });
+  const note = $('rev-note'); note.value = store.get('kh-note', '');
+  let nt; note.addEventListener('input', () => { clearTimeout(nt); nt = setTimeout(() => { store.set('kh-note', note.value); $('note-saved').textContent = T('Đã lưu trên máy này', 'Saved on this device'); renderReview(); }, 400); });
+  $('btn-reset').addEventListener('click', () => { checked = {}; store.set('kh-review', checked); ul.querySelectorAll('input').forEach(c => { c.checked = false; }); renderReview(); });
+  function renderReview() {
+    const IT = items(), n = IT.filter(([id]) => checked[id]).length, open = IT.length - n;
+    [...ul.children].forEach((li, i) => {
+      li.classList.toggle('done', !!checked[IT[i][0]]);
+      li.querySelector('b').textContent = IT[i][1]; li.querySelector('span').textContent = IT[i][2];
+    });
+    $('rev-count').textContent = T(`${n} / ${IT.length} đã xác nhận`, `${n} of ${IT.length} confirmed`);
+    $('rev-bar').style.width = (n / IT.length * 100) + '%';
+    $('rev-sub').textContent = open
+      ? T(`Còn ${open} mục chưa xác nhận. Đánh dấu từng mục sau khi xem bản vẽ, rồi gửi kết quả.`, `${open} item${open > 1 ? 's' : ''} still to confirm. Tick each item after checking the drawing, then send the result.`)
+      : T('Đã xác nhận đủ các mục. Gửi kết quả cho bên thiết kế.', 'All items confirmed. Send the result to the designer.');
+    $('nav-open').textContent = open || '';
+    const body = [T(`Kết quả duyệt thiết kế thanh kê PVC chữ U H20–H70 (bản ${DATA.date})`, `Design review result, PVC U-channel rebar spacer H20–H70 (issue ${DATA.date})`), '',
+      ...IT.map(([id, t]) => `[${checked[id] ? 'x' : ' '}] ${t}`), '', T('Ghi chú:', 'Notes:'), note.value || T('(không)', '(none)')].join('\n');
+    $('btn-mail').href = 'mailto:?subject=' + encodeURIComponent(T('Xác nhận thiết kế thanh kê PVC chữ U H20–H70', 'Design confirmation, PVC U-channel rebar spacer H20–H70')) + '&body=' + encodeURIComponent(body);
+  }
+
+  // ---------- điều hướng (mỗi mục là một màn hình riêng, theo #hash)
+  const ROUTES = { 'ban-ve': ['Bản vẽ', 'Drawing'], 'mo-hinh-3d': ['Mô hình 3D', '3D model'], 'thanh-cat': ['Thanh cắt', 'Cut bars'], 'so-sanh': ['So sánh cỡ', 'Size comparison'], 'duyet': ['Duyệt thiết kế', 'Design review'] };
+  const routeName = id => T(...ROUTES[id]);
+  const curRoute = () => { const r = location.hash.slice(1); return ROUTES[r] ? r : 'ban-ve'; };
+  const side = $('side'), menuBtn = $('btn-menu');
+  const closeMenu = () => { side.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); };
+  menuBtn.addEventListener('click', () => { side.classList.add('open'); menuBtn.setAttribute('aria-expanded', 'true'); side.querySelector('a')?.focus(); });
+  $('btn-close').addEventListener('click', () => { closeMenu(); menuBtn.focus(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && side.classList.contains('open')) { closeMenu(); menuBtn.focus(); } });
+  const routeLabels = id => { $('crumb').textContent = routeName(id); document.title = `${routeName(id)} · ${T('Thanh kê PVC chữ U', 'PVC U-channel spacer')}`; };
+  function route() {
+    const id = curRoute();
+    Object.keys(ROUTES).forEach(k => { $('view-' + k).hidden = k !== id; });
+    $('main').prepend($('view-' + id));          // màn hình đang mở đứng đầu: h1 đầu tiên của trang là h1 của nó
+    document.querySelectorAll('.nav a').forEach(a => { if (a.dataset.route === id) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+    routeLabels(id);
+    closeMenu();
+    if (id === 'thanh-cat' || id === 'so-sanh') renderCharts();
+    window.scrollTo(0, 0);
+  }
+  addEventListener('hashchange', route);
+
+  // ---------- giao diện sáng / tối (ghi nhớ trên máy người xem)
+  const root = document.documentElement;
+  const setTheme = t => { root.dataset.theme = t; $('theme-label').textContent = t === 'dark' ? T('Giao diện sáng', 'Light theme') : T('Giao diện tối', 'Dark theme'); };
+  setTheme(store.get('kh-theme2', matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+  $('btn-theme').addEventListener('click', () => { const t = root.dataset.theme === 'dark' ? 'light' : 'dark'; setTheme(t); store.set('kh-theme2', t); renderCharts(); });
+
+  // ---------- song ngữ Việt / Anh
+  // Chữ tĩnh: phần tử có data-en (nội dung) hoặc data-en-title / data-en-aria / data-en-ph (thuộc tính); bản tiếng Việt giữ trong data-vi*.
+  const ATTRS = [['enTitle', 'viTitle', 'title'], ['enAria', 'viAria', 'aria-label'], ['enPh', 'viPh', 'placeholder']];
+  function applyStatic() {
+    document.querySelectorAll('[data-en]').forEach(e => { if (e.dataset.vi == null) e.dataset.vi = e.innerHTML; e.innerHTML = LANG === 'en' ? e.dataset.en : e.dataset.vi; });
+    for (const [en, vi, attr] of ATTRS) document.querySelectorAll(`[data-${en.replace(/[A-Z]/g, c => '-' + c.toLowerCase())}]`).forEach(e => {
+      if (e.dataset[vi] == null) e.dataset[vi] = e.getAttribute(attr) || '';
+      e.setAttribute(attr, LANG === 'en' ? e.dataset[en] : e.dataset[vi]);
+    });
+    root.lang = LANG;
+    document.querySelectorAll('[data-lang]').forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === LANG));
+    $('stamp').textContent = T(`Bản duyệt thiết kế · lập ${DATA.date}`, `Design review issue · ${DATA.date}`);
+    if ($('note-saved').textContent) $('note-saved').textContent = T('Đã lưu trên máy này', 'Saved on this device');
+  }
+  function setLang(l) {
+    if (l === LANG) return;
+    LANG = l; store.set('kh-lang', l);
+    applyStatic(); setTheme(root.dataset.theme);
+    const s = S[cur];
+    drawSheet($('d-sheet'), s); renderSpecs(s); renderCut(); renderCharts(); renderTable();
+    renderCmpFinding(); renderReview(); routeLabels(curRoute());
+  }
+  document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+
+  applyStatic(); setTheme(root.dataset.theme);
+  const saved = store.get('kh-size', null), start = Math.max(0, S.findIndex(s => String(s.H) === String(saved)));
+  select(start);
+  renderCmpFinding();
+  renderReview();
+  route();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { drawSheet($('d-sheet'), S[cur]); });
+})();
+</script>
+<script>/*@DASH3D@*/</script>
+</body>
+</html>

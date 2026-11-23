@@ -1,0 +1,6 @@
+node_modules/
+Dashboard_KH/web/dist/
+Dashboard_KH/dashboard_mau_kh.html
+*.bak
+.taste-skill/
+__pycache__/

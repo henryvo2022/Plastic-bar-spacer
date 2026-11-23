@@ -1,0 +1,10 @@
+{
+  "name": "pvc-spacer-mau-kh-viewer",
+  "private": true,
+  "description": "Đóng gói trang xem 3D bộ Mẫu KH thành 1 file HTML chạy offline",
+  "devDependencies": {
+    "esbuild": "0.24.0",
+    "tailwindcss": "3.4.14",
+    "three": "0.160.0"
+  }
+}
