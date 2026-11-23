@@ -51,13 +51,30 @@ export class Dxf {
     this.g(0, 'SEQEND', 8, L);
   }
   toString() {
+    // Khung file đủ cấu trúc DXF R12 (AC1009) như AutoCAD tự ghi: HEADER, TABLES (VPORT, LTYPE, LAYER, STYLE, VIEW, UCS, APPID, DIMSTYLE),
+    // BLOCKS ($Model_Space, $Paper_Space), ENTITIES. Không có biến chỉ có từ R2000 (như $INSUNITS) và không dùng handle.
     const h = [];
     const G = (...a) => { for (let i = 0; i < a.length; i += 2) h.push(String(a[i]), typeof a[i + 1] === 'number' ? n(a[i + 1]) : String(a[i + 1])); };
     const mn = this.min.map(v => isFinite(v) ? v : 0), mx = this.max.map(v => isFinite(v) ? v : 0);
+    const lim = [Math.min(mn[0], 0), Math.min(mn[1], 0), Math.max(mx[0], 420), Math.max(mx[1], 297)];
     G(0, 'SECTION', 2, 'HEADER', 9, '$ACADVER', 1, 'AC1009', 9, '$DWGCODEPAGE', 3, 'ANSI_1252',
       9, '$INSBASE', 10, 0, 20, 0, 30, 0, 9, '$EXTMIN', 10, mn[0], 20, mn[1], 30, mn[2], 9, '$EXTMAX', 10, mx[0], 20, mx[1], 30, mx[2],
-      9, '$LIMMIN', 10, mn[0], 20, mn[1], 9, '$LIMMAX', 10, mx[0], 20, mx[1], 9, '$LTSCALE', 40, 1, 9, '$INSUNITS', 70, 4, 0, 'ENDSEC');
+      9, '$LIMMIN', 10, lim[0], 20, lim[1], 9, '$LIMMAX', 10, lim[2], 20, lim[3],
+      9, '$ORTHOMODE', 70, 0, 9, '$REGENMODE', 70, 1, 9, '$FILLMODE', 70, 1, 9, '$QTEXTMODE', 70, 0, 9, '$MIRRTEXT', 70, 0,
+      9, '$LTSCALE', 40, 1, 9, '$ATTMODE', 70, 1, 9, '$TEXTSIZE', 40, 2.5, 9, '$TRACEWID', 40, 1, 9, '$TEXTSTYLE', 7, 'STANDARD',
+      9, '$CLAYER', 8, '0', 9, '$CELTYPE', 6, 'BYLAYER', 9, '$CECOLOR', 62, 256,
+      9, '$DIMSCALE', 40, 1, 9, '$DIMASZ', 40, 2.5, 9, '$DIMEXO', 40, 0.625, 9, '$DIMDLI', 40, 3.75, 9, '$DIMTXT', 40, 2.5,
+      9, '$COORDS', 70, 1, 9, '$HANDLING', 70, 0, 9, '$LUNITS', 70, 2, 9, '$LUPREC', 70, 4, 9, '$AUNITS', 70, 0, 9, '$AUPREC', 70, 2,
+      9, '$ELEVATION', 40, 0, 9, '$PELEVATION', 40, 0, 9, '$THICKNESS', 40, 0, 9, '$LIMCHECK', 70, 0,
+      9, '$ANGBASE', 50, 0, 9, '$ANGDIR', 70, 0, 9, '$PDMODE', 70, 0, 9, '$PDSIZE', 40, 0, 9, '$PLINEWID', 40, 0,
+      9, '$UCSNAME', 2, '', 9, '$UCSORG', 10, 0, 20, 0, 30, 0, 9, '$UCSXDIR', 10, 1, 20, 0, 30, 0, 9, '$UCSYDIR', 10, 0, 20, 1, 30, 0,
+      9, '$WORLDVIEW', 70, 1, 9, '$TILEMODE', 70, 1, 9, '$MAXACTVP', 70, 64, 0, 'ENDSEC');
     G(0, 'SECTION', 2, 'TABLES');
+    G(0, 'TABLE', 2, 'VPORT', 70, 1);
+    G(0, 'VPORT', 2, '*ACTIVE', 70, 0, 10, 0, 20, 0, 11, 1, 21, 1, 12, mx[0] / 2, 22, mx[1] / 2, 13, 0, 23, 0, 14, 0.5, 24, 0.5, 15, 0.5, 25, 0.5,
+      16, 0, 26, 0, 36, 1, 17, 0, 27, 0, 37, 0, 40, Math.max(mx[1] - mn[1], 100) * 1.2, 41, 1.34, 42, 50, 43, 0, 44, 0, 50, 0, 51, 0,
+      71, 0, 72, 1000, 73, 1, 74, 3, 75, 0, 76, 0, 77, 0, 78, 0);
+    G(0, 'ENDTAB');
     G(0, 'TABLE', 2, 'LTYPE', 70, 3);
     G(0, 'LTYPE', 2, 'CONTINUOUS', 70, 0, 3, 'Solid line', 72, 65, 73, 0, 40, 0);
     G(0, 'LTYPE', 2, 'DASHED', 70, 0, 3, '__ __ __', 72, 65, 73, 2, 40, 3, 49, 2, 49, -1);
@@ -70,7 +87,19 @@ export class Dxf {
     G(0, 'TABLE', 2, 'STYLE', 70, 2);
     G(0, 'STYLE', 2, 'STANDARD', 70, 0, 40, 0, 41, 1, 50, 0, 71, 0, 42, 2.5, 3, 'txt', 4, '');
     G(0, 'STYLE', 2, 'KH', 70, 0, 40, 0, 41, 1, 50, 0, 71, 0, 42, 2.5, 3, 'arial.ttf', 4, '');
+    G(0, 'ENDTAB');
+    G(0, 'TABLE', 2, 'VIEW', 70, 0, 0, 'ENDTAB');
+    G(0, 'TABLE', 2, 'UCS', 70, 0, 0, 'ENDTAB');
+    G(0, 'TABLE', 2, 'APPID', 70, 1, 0, 'APPID', 2, 'ACAD', 70, 0, 0, 'ENDTAB');
+    G(0, 'TABLE', 2, 'DIMSTYLE', 70, 1);
+    G(0, 'DIMSTYLE', 2, 'STANDARD', 70, 0, 3, '', 4, '', 5, '', 6, '', 7, '', 40, 1, 41, 2.5, 42, 0.625, 43, 3.75, 44, 1.25, 45, 0, 46, 0, 47, 0, 48, 0,
+      140, 2.5, 141, 2.5, 142, 0, 143, 0.03937007874, 144, 1, 145, 0, 146, 1, 147, 0.625,
+      71, 0, 72, 0, 73, 0, 74, 0, 75, 0, 76, 0, 77, 1, 78, 8, 170, 0, 171, 3, 172, 1, 173, 0, 174, 0, 175, 0, 176, 0, 177, 0, 178, 0);
     G(0, 'ENDTAB', 0, 'ENDSEC');
+    G(0, 'SECTION', 2, 'BLOCKS');
+    G(0, 'BLOCK', 8, '0', 2, '$MODEL_SPACE', 70, 0, 10, 0, 20, 0, 30, 0, 3, '$MODEL_SPACE', 1, '', 0, 'ENDBLK', 8, '0');
+    G(0, 'BLOCK', 8, '0', 2, '$PAPER_SPACE', 70, 0, 10, 0, 20, 0, 30, 0, 3, '$PAPER_SPACE', 1, '', 0, 'ENDBLK', 8, '0');
+    G(0, 'ENDSEC');
     G(0, 'SECTION', 2, 'ENTITIES');
     const tail = ['0', 'ENDSEC', '0', 'EOF'];
     return h.concat(this.out, tail).join('\r\n') + '\r\n';
