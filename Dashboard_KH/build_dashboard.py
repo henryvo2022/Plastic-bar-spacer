@@ -1,7 +1,8 @@
 """Dashboard duyệt thiết kế — bộ Mẫu KH (thanh kê PVC chữ U H20–H70).
 
-Giai đoạn duyệt thiết kế: CHỈ đưa hình học (bản vẽ, kích thước lỗ, bước dập) — bỏ khối lượng,
-hệ số an toàn, độ lún, giá. Đọc ../Mau_KH/tinh_toan/spacer_data.json, chèn vào dashboard.src.html
+Giai đoạn duyệt thiết kế: các màn hình Bản vẽ / 3D / Thanh cắt / So sánh / Duyệt chỉ đưa hình học — không có
+hệ số an toàn, độ lún, giá. Riêng màn hình Phiếu kỹ thuật (data sheet) có khối lượng và tải phá hủy ước tính
+(số liệu mô phỏng, ghi chú rõ trên phiếu). Đọc ../Mau_KH/tinh_toan/spacer_data.json, chèn vào dashboard.src.html
 -> dashboard_mau_kh.html (1 file, chạy offline, in được A4).
 
 Sản phẩm: profile PVC đùn + dập lỗ liên tục trên dây chuyền, cắt thanh 2 000 mm
@@ -11,7 +12,9 @@ Chạy:  python build_dashboard.py
 """
 from __future__ import annotations
 
+import base64
 import datetime
+import io
 import json
 import os
 import subprocess
@@ -41,6 +44,27 @@ def bundle_3d():
 BAR_LEN = 2000  # mm, chiều dài cắt thanh
 
 
+def sim_numbers(H, spec):
+    """Khối lượng thanh 2 m và tải phá hủy ước tính (mô hình mô phỏng) — dùng cho màn hình Phiếu kỹ thuật."""
+    sys.path.insert(0, SRC)
+    from de_xuat_theo_kum import evaluate
+    r = evaluate(spec)
+    return dict(kg=round(r["kg"], 3), p23=int(round(r["P23"] / 10) * 10), p45=int(round(r["P45"] / 10) * 10))
+
+
+def product_image(H):
+    """Ảnh sản phẩm (mô hình 3D, đoạn 400 mm) -> JPEG nhỏ dạng data URI; thiếu ảnh thì bỏ qua."""
+    p = os.path.join(HERE, "datasheet", "img", f"prod{H}.png")
+    if not os.path.isfile(p):
+        return ""
+    from PIL import Image
+    im = Image.open(p).convert("RGB")
+    im.thumbnail((1000, 1000))
+    b = io.BytesIO()
+    im.save(b, "JPEG", quality=84, optimize=True)
+    return "data:image/jpeg;base64," + base64.b64encode(b.getvalue()).decode()
+
+
 def r2(x):
     return None if x is None else round(float(x), 2)
 
@@ -48,6 +72,7 @@ def r2(x):
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     d = json.load(open(os.path.join(SRC, "spacer_data.json"), encoding="utf-8"))
+    specs = {e["H"]: e["spec"] for e in json.load(open(os.path.join(SRC, "thong_so_mau_kh.json"), encoding="utf-8"))}
     sizes = []
     for row in d["customer"]:
         g = row["arch"]
@@ -59,7 +84,8 @@ def main():
             archW=g["archW"], archH=g["archH"], archR=g["archR"], d=g["archDia"], yh=g["archHoleY"],
             P=g["P"], slotW=g["slotWid"], slotL=g["slotLen"], slotR=g["slotR"], slotP=g.get("slotPitch") or g["P"],
             slotType="oval" if oval_top else "bo góc",
-            open=r2(a["open_pct"]),
+            open=r2(a["open_pct"]), **sim_numbers(row["size"], specs[row["size"]]),
+            img=product_image(row["size"]),
             geo={**{k: g[k] for k in GEO_KEYS if k in g}, "H": row["size"]},
         ))
     data = dict(sizes=sizes, bar_len=BAR_LEN, date=datetime.date.today().strftime("%d/%m/%Y"))

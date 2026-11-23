@@ -8,6 +8,7 @@
 | `web/charts.js` | Thư viện biểu đồ SVG nhỏ (không phụ thuộc), chèn nguyên vào trang khi build. |
 | `web/dxf.js` | Ghi file DXF R12 (AutoCAD mở trực tiếp), chia lớp nét, chữ tiếng Việt font Arial. |
 | `build_dashboard.py` | Lấy hình học từ `../Mau_KH/tinh_toan/spacer_data.json`, gộp `web/dash3d.src.js` bằng esbuild (dùng `node_modules` của `Mau_KH/tinh_toan/web`), tạo lại `dashboard_mau_kh.html` (~580 KB, chạy offline). |
+| `build_datasheet.py`, `datasheet/` | Data sheet A4 một trang cho từng cỡ (`DataSheet_PVC-U20…U70.pdf`), bố cục theo phiếu Technical Data; khối lượng và tải phá hủy ước tính lấy từ mô hình mô phỏng, có chú thích "Số liệu dựa trên tính toán mô phỏng, sẽ cập nhật khi có thí nghiệm sản phẩm thực tế". Ảnh sản phẩm: `datasheet/img/`. Tạo lại: `python build_datasheet.py`. |
 | `*_truoc_duyet_tk.html.bak` | Bản dashboard trước (có hệ số an toàn, khối lượng). |
 | `dashboard.src_truoc_saas.html.bak` | Bản một trang cuộn trước khi đổi sang giao diện ứng dụng (23/11/2026). |
 
@@ -22,11 +23,12 @@ python build_dashboard.py
 
 **Giai đoạn duyệt thiết kế (từ 23/11/2026):** chỉ đưa hình học — bỏ khối lượng, hệ số an toàn, độ lún, phương án dự phòng.
 
-**Giao diện (từ 23/11/2026):** dạng ứng dụng nhiều màn hình. Thanh bên trái + thanh trên cùng là một khung xám, nội dung đặt trên "tờ" trắng; bộ lọc cỡ H20–H70 ở thanh trên áp dụng cho mọi màn hình; chế độ sáng/tối; điện thoại: menu gập, bộ lọc cỡ thành hàng riêng. Font IBM Plex Sans tải từ Google Fonts, mất mạng thì dùng font hệ thống. Năm màn hình (địa chỉ `#ban-ve`, `#mo-hinh-3d`, `#thanh-cat`, `#so-sanh`, `#duyet`):
+**Giao diện (từ 23/11/2026):** dạng ứng dụng nhiều màn hình. Thanh bên trái + thanh trên cùng là một khung xám, nội dung đặt trên "tờ" trắng; bộ lọc cỡ H20–H70 ở thanh trên áp dụng cho mọi màn hình; chế độ sáng/tối; điện thoại: menu gập, bộ lọc cỡ thành hàng riêng. Font IBM Plex Sans tải từ Google Fonts, mất mạng thì dùng font hệ thống. Sáu màn hình (địa chỉ `#ban-ve`, `#mo-hinh-3d`, `#thanh-cat`, `#so-sanh`, `#data-sheet`, `#duyet`):
 - **Bản vẽ**: tiêu đề mã + cỡ, câu nhận xét chính (cầu nhựa mỏng nhất), 5 chỉ số hình học, tờ bản vẽ, khung tên, bảng thông số; nút Xuất DXF bản vẽ.
 - **Mô hình 3D**: chiều dài, góc nhìn, Xuất DXF 3D.
 - **Thanh cắt**: tỷ lệ đầu thanh có lỗ hở / mép mỏng, 3 thanh cắt ngẫu nhiên + thanh trượt e, biểu đồ tỷ lệ mép mỏng theo cỡ.
 - **So sánh cỡ**: biểu đồ cầu nhựa mỏng nhất / chiều dày thành (đường 1,00), bảng kích thước có lọc "Cần lưu ý", bấm dòng để mở bản vẽ cỡ đó.
+- **Phiếu kỹ thuật** (`#data-sheet`): data sheet một trang A4 cho cỡ đang chọn, bố cục như phiếu Technical Data (tiêu đề, mã hàng, ảnh mô hình 3D, bảng thông số hai cột, khung ghi chú "Số liệu dựa trên tính toán mô phỏng, sẽ cập nhật khi có thí nghiệm sản phẩm thực tế"). Theo nút VI | EN; nút In / lưu PDF chỉ in đúng tờ này. Khối lượng và tải phá hủy ước tính lấy từ mô hình mô phỏng khi chạy `build_dashboard.py`; ảnh lấy từ `datasheet/img/`. Đây là màn hình duy nhất có khối lượng / tải ước tính.
 - **Duyệt thiết kế**: danh sách mục cần khách xác nhận (đánh dấu và ghi chú lưu trên máy người xem), nút gửi kết quả qua email (mở trình gửi thư với nội dung điền sẵn).
 
 **Liên kết, bàn phím, in (từ 23/11/2026):** địa chỉ giữ màn hình, cỡ và ngôn ngữ, ví dụ `dashboard_mau_kh.html#ban-ve?co=H40&lang=en`; nút "Sao chép liên kết" trên thanh trên cùng gửi đúng bản vẽ cho khách. Có liên kết "Bỏ qua tới nội dung chính", mô hình 3D điều khiển bằng bàn phím (mũi tên xoay, `+`/`-` phóng, `Home` về ban đầu), vùng bấm ≥ 44 px trên màn hình cảm ứng. Nút In / lưu PDF chỉ in màn hình đang xem (A4, nền trắng); màn hình Bản vẽ ra 2 trang.

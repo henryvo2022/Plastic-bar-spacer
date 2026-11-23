@@ -333,6 +333,50 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
   .tblock > div { padding: 3px 8px; }
   .tblock .k { font-size: 9px; }
   .dwg-scroll { padding: 0 !important; }
+  #view-data-sheet .title-row { display: none; }
+  .ds { max-width: none; margin: 0; padding: 0; border: 0; font-size: 11.5px; line-height: 1.4; }
+  .ds-title { font-size: 18px; line-height: 24px; }
+  .ds-photo { min-height: 0; }
+  .ds-photo img { max-height: 48mm; width: auto; }
+  .ds-h { margin: 14px 0 8px; }
+  .ds table { font-size: 11.5px; }
+  .ds th, .ds td { padding: 4px 8px; }
+  .ds-note { margin-top: 12px; padding: 7px 12px; }
+  .ds tr:nth-child(odd) > *, .ds-note { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* ---------- phiếu kỹ thuật (data sheet) */
+.ds { max-width: 920px; margin: 0 auto 24px; padding: 28px 32px 20px; border-radius: var(--radius-card); }
+.ds-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+.ds-title { margin: 0; font-size: 21px; line-height: 28px; font-weight: 700; color: var(--seal); }
+.ds-title small { display: block; font-size: 13px; line-height: 18px; font-weight: 500; color: var(--muted); margin-top: 4px; }
+.ds-item { margin-top: 10px; font-weight: 700; }
+.ds-brand { flex: none; width: 118px; color: var(--seal); }
+.ds-mid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; margin-top: 18px; }
+.ds-mid ul { margin: 0; padding: 0 0 0 18px; list-style: none; }
+.ds-mid li { position: relative; margin-bottom: 8px; }
+.ds-mid li::before { content: ""; position: absolute; left: -16px; top: .6em; width: 6px; height: 6px; background: var(--seal); }
+.ds-photo { border: 1px solid var(--border); padding: 8px; display: flex; align-items: center; justify-content: center; min-height: 150px; }
+.ds-photo img { display: block; max-width: 100%; height: auto; }
+.ds-h { margin: 22px 0 10px; padding-bottom: 6px; border-bottom: 2px solid var(--seal); font-size: 18px; font-weight: 400; }
+.ds-tabs { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 16px; }
+.ds table { font-size: 14px; }
+.ds tr:nth-child(odd) > * { background: #e7e9ea; }
+.ds th, .ds td { height: auto; padding: 7px 10px; border: 0; vertical-align: middle; white-space: normal; }
+.ds th { text-align: left; font-weight: 600; width: 54%; }
+.ds td.v { text-align: right; white-space: nowrap; }
+.ds td.u { text-align: left; width: 18%; padding-left: 4px; white-space: nowrap; }
+.ds sup { color: var(--seal); font-weight: 700; }
+.ds-note { margin: 18px 0 0; padding: 10px 14px; border-left: 4px solid var(--seal); background: #fbeef0; font-weight: 600; }
+.ds-note b { color: var(--seal); }
+.ds-fine { margin: 12px 0 0; font-size: 12px; color: var(--muted); }
+.ds-foot { margin-top: 18px; padding-top: 8px; border-top: 1px solid #1c3b57; display: flex; justify-content: space-between; gap: 16px; font-size: 12px; color: var(--text); }
+@media (max-width: 720px) {
+  .ds { padding: 18px 16px 14px; }
+  .ds-mid, .ds-tabs { grid-template-columns: 1fr; }
+  .ds-brand { width: 92px; }
+  .ds-title { font-size: 18px; line-height: 24px; }
+  .ds-foot { flex-direction: column; gap: 2px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
@@ -360,6 +404,7 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
       <a href="#mo-hinh-3d" data-route="mo-hinh-3d"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg><span data-en="3D model">Mô hình 3D</span></a>
       <a href="#thanh-cat" data-route="thanh-cat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="6" cy="7" r="2.5"/><circle cx="6" cy="17" r="2.5"/><path d="M8 8.5L20 17M8 15.5L20 7"/></svg><span data-en="Cut bars">Thanh cắt</span></a>
       <a href="#so-sanh" data-route="so-sanh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span data-en="Size comparison">So sánh cỡ</span></a>
+      <a href="#data-sheet" data-route="data-sheet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 3.5h8.5L19 8v12.5H6z"/><path d="M14 3.5V8.5h5M9 12.5h7M9 15.5h7M9 18.5h4"/></svg><span data-en="Data sheet">Phiếu kỹ thuật</span></a>
       <a href="#duyet" data-route="duyet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg><span data-en="Design review">Duyệt thiết kế</span><span class="count num" id="nav-open" title="Mục chưa xác nhận" data-en-title="Unconfirmed items"></span></a>
     </nav>
     <div class="side-foot">
@@ -504,6 +549,21 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
         </div>
         <p class="empty" id="tbl-empty" hidden data-en="No size has an edge distance below the flange thickness.">Không có cỡ nào có khoảng cách mép lỗ nhỏ hơn chiều dày cánh.</p>
       </div>
+    </section>
+
+    <!-- ===== Phiếu kỹ thuật ===== -->
+    <section class="view" id="view-data-sheet" aria-labelledby="h-ds" hidden>
+      <div class="title-row">
+        <div>
+          <h1 id="h-ds"><span data-en="Data sheet">Phiếu kỹ thuật</span> · <span class="code" id="ds-code">--</span></h1>
+          <p data-en="One A4 page per size. Pick the size above, then Print / save PDF to send it to the customer.">Một trang A4 cho mỗi cỡ. Chọn cỡ ở trên rồi bấm In / lưu PDF để gửi khách.</p>
+        </div>
+        <div class="actions">
+          <button class="btn primary" type="button" onclick="window.print()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7 9V3.5h10V9M7 17H4.5V9.5h15V17H17M7 14h10v6.5H7z"/></svg><span data-en="Print / save PDF">In / lưu PDF</span></button>
+        </div>
+      </div>
+      <div class="panel paper ds" id="ds" aria-live="polite"></div>
     </section>
 
     <!-- ===== Duyệt thiết kế ===== -->
@@ -994,7 +1054,7 @@ const DATA = /*@DATA@*/{};
   });
   function select(i) {
     cur = i; const s = S[i];
-    drawSheet($('d-sheet'), s); renderSpecs(s); newBars(s); renderCut(); renderCharts();
+    drawSheet($('d-sheet'), s); renderSpecs(s); newBars(s); renderCut(); renderCharts(); renderDatasheet();
     [...tabs.children].forEach((t, j) => { t.setAttribute('aria-checked', j === cur); t.tabIndex = j === cur ? 0 : -1; });
     renderTable();
     try { localStorage.setItem('kh-size', String(s.H)); } catch (e) {}
@@ -1093,8 +1153,64 @@ const DATA = /*@DATA@*/{};
     $('btn-mail').href = 'mailto:han@hancorporation.vn?subject=' + encodeURIComponent(T('Xác nhận thiết kế thanh kê cốt thép PVC chữ U H20–H70', 'Design confirmation, PVC U-channel rebar spacer H20–H70')) + '&body=' + encodeURIComponent(body);
   }
 
+  // ---------- phiếu kỹ thuật (data sheet): một trang A4 cho cỡ đang chọn
+  function renderDatasheet() {
+    const s = S[cur], H = s.H, code = s.code;
+    $('ds-code').textContent = code;
+    const st = '<sup>*</sup>', row = (lv, le, v, u, star) => `<tr><th scope="row">${T(lv, le)}</th><td class="v">${v}${star ? st : ''}</td><td class="u">${u}</td></tr>`;
+    const t1 = x => Number(x).toLocaleString(LOC(), { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const thick = Math.abs(s.tw - s.ttop) < 1e-9 ? t1(s.tw) : `${t1(s.tw)} / ${t1(s.ttop)}`;
+    const left = [
+      row('Lớp bê tông bảo vệ', 'Concrete cover', nf(H, 0), 'mm'),
+      row('Chiều dài', 'Length', nf(L, 0), 'mm'),
+      row('Giới hạn dưới lớp bảo vệ', 'Lower tolerance limit', nf(H - 1, 0), 'mm'),
+      row('Giới hạn trên lớp bảo vệ', 'Upper tolerance limit', nf(H + 1, 0), 'mm'),
+      row('Kích thước tiết diện W × H', 'Section W × H', `${nf(s.W, 0)} × ${nf(H, 0)}`, 'mm'),
+      row('Chiều dày cánh / bụng', 'Flange / web thickness', thick, 'mm'),
+      row('Bước lỗ P (so le P/2)', 'Hole pitch P (staggered P/2)', nf(s.P, 0), 'mm'),
+      row('Đơn vị bán', 'Storage unit', T('Thanh', 'Bar'), 'Pce'),
+      row('Quy cách đóng gói', 'Packaging unit', T('Theo thỏa thuận', 'To be agreed'), ''),
+    ].join('');
+    const right = [
+      row('Khối lượng', 'Weight', nf(s.kg, 3), T('kg/thanh', 'kg/bar'), true),
+      row('Khuyết vòm (rộng × cao)', 'Arch notch (w × h)', `${nf(s.archW, 0)} × ${nf(s.archH)}`, 'mm'),
+      row('Lỗ tròn, tâm cách mặt ván', 'Round hole, centre height', `Ø${nf(s.d, 0)}, ${nf(s.yh)}`, 'mm'),
+      row('Lỗ bụng (dài × rộng)', 'Web slot (L × w)', `${nf(s.slotL, 0)} × ${nf(s.slotW, 0)}`, 'mm'),
+      row('Tỷ lệ lỗ trên cánh', 'Flange open area', nf(s.open, 0), '%', true),
+      row('Tải phá hủy ước tính, 23&nbsp;°C', 'Est. breaking load at 23&nbsp;°C', '~' + nf(s.p23, 0), 'N', true),
+      row('Tải phá hủy ước tính, 45&nbsp;°C', 'Est. breaking load at 45&nbsp;°C', '~' + nf(s.p45, 0), 'N', true),
+      row('Cấp cháy (DIN 4102)', 'Building material class', T('Chờ thí nghiệm', 'To be tested'), ''),
+      row('Vật liệu', 'Material', T('uPVC tái chế', 'Recycled uPVC'), ''),
+    ].join('');
+    const nb = '&nbsp;';
+    const title = LANG === 'en'
+      ? `PVC U-channel rebar spacer with arch notches, c${nb}${nf(H, 0)}${nb}mm, length${nb}${nf(L, 0)}${nb}mm`
+      : `Thanh kê cốt thép PVC chữ U có khuyết vòm, c${nb}=${nb}${nf(H, 0)}${nb}mm, dài${nb}${nf(L, 0)}${nb}mm`;
+    const sub = LANG === 'en' ? '' : `<small>PVC U-channel rebar spacer with arch notches, c ${nf(H, 0)} mm, length ${nf(L, 0)} mm</small>`;
+    const img = s.img ? `<img src="${s.img}" alt="${T('Ảnh mô hình 3D', '3D model image')} ${code}">` : '';
+    $('ds').innerHTML = `
+      <div class="ds-top">
+        <div><h2 class="ds-title">${title}${sub}</h2><div class="ds-item">${T('Mã hàng', 'Item No.')} ${code}</div></div>
+        <svg class="ds-brand" viewBox="0 0 170 64" role="img" aria-label="${T('Dấu HAN CORPORATION', 'HAN CORPORATION stamp')}"><use href="#seal"/></svg>
+      </div>
+      <div class="ds-mid">
+        <ul>
+          <li>${T(`Dùng kê cốt thép cho cấu kiện nằm ngang, giữ lớp bê tông bảo vệ c${nb}=${nb}${nf(H, 0)}${nb}mm.`, `For horizontal members; holds the concrete cover at c${nb}${nf(H, 0)}${nb}mm.`)}</li>
+          <li>${T(`Khuyết vòm và lỗ tròn bố trí so le giữa hai cánh để bê tông chảy qua (tỷ lệ lỗ trên cánh ${nf(s.open, 0)}%).`, `Staggered arch notches and round holes let concrete flow through (flange open area ${nf(s.open, 0)}%).`)}</li>
+          <li>${T(`Đùn ép biên dạng, dập lỗ liên tục; thanh cắt dài ${nf(L, 0)} mm.`, `Profile extrusion with continuous punching; bars cut to ${nf(L, 0)} mm.`)}</li>
+        </ul>
+        <div class="ds-photo">${img}</div>
+      </div>
+      <h3 class="ds-h">${T('Thông số kỹ thuật', 'Technical data')}</h3>
+      <div class="ds-tabs"><table><tbody>${left}</tbody></table><table><tbody>${right}</tbody></table></div>
+      <p class="ds-note"><b>*</b> ${T('Số liệu dựa trên tính toán mô phỏng, sẽ cập nhật khi có thí nghiệm sản phẩm thực tế.', 'Figures are based on simulation; they will be updated once tests on actual products are available.')}</p>
+      <p class="ds-fine">${T('Tải phá hủy ước tính: tải tập trung qua thanh thép đặt trên thanh kê, tính bằng mô hình chưa hiệu chỉnh; chưa phải kết quả thử theo quy trình của DBV. Khối lượng tính với khối lượng riêng uPVC tái chế 1,48 g/cm³. Dung sai lớp bảo vệ ±1 mm là đề xuất, chờ thống nhất.',
+        'Breaking load: point load through a rebar placed on the spacer, from an uncalibrated model; not a DBV test result. Weight uses 1.48 g/cm³ recycled uPVC. The ±1 mm cover tolerance is proposed and to be agreed.')}</p>
+      <div class="ds-foot"><span>HAN CORPORATION | han@hancorporation.vn</span><span>${T('Ngày lập', 'Date of creation')}: ${DATA.date}</span></div>`;
+  }
+
   // ---------- điều hướng (mỗi mục là một màn hình riêng, theo #hash)
-  const ROUTES = { 'ban-ve': ['Bản vẽ', 'Drawing'], 'mo-hinh-3d': ['Mô hình 3D', '3D model'], 'thanh-cat': ['Thanh cắt', 'Cut bars'], 'so-sanh': ['So sánh cỡ', 'Size comparison'], 'duyet': ['Duyệt thiết kế', 'Design review'] };
+  const ROUTES = { 'ban-ve': ['Bản vẽ', 'Drawing'], 'mo-hinh-3d': ['Mô hình 3D', '3D model'], 'thanh-cat': ['Thanh cắt', 'Cut bars'], 'so-sanh': ['So sánh cỡ', 'Size comparison'], 'data-sheet': ['Phiếu kỹ thuật', 'Data sheet'], 'duyet': ['Duyệt thiết kế', 'Design review'] };
   const routeName = id => T(...ROUTES[id]);
   const curRoute = () => { const r = location.hash.slice(1).split('?')[0]; return ROUTES[r] ? r : 'ban-ve'; };
   // địa chỉ chia sẻ được: #ban-ve?co=H40&lang=en (cỡ và ngôn ngữ nằm trên địa chỉ, cập nhật không làm đầy lịch sử)
@@ -1147,7 +1263,7 @@ const DATA = /*@DATA@*/{};
     LANG = l; store.set('kh-lang', l);
     applyStatic(); setTheme(root.dataset.theme);
     const s = S[cur];
-    drawSheet($('d-sheet'), s); renderSpecs(s); renderCut(); renderCharts(); renderTable();
+    drawSheet($('d-sheet'), s); renderSpecs(s); renderCut(); renderCharts(); renderTable(); renderDatasheet();
     renderCmpFinding(); renderReview(); routeLabels(curRoute()); syncHash();
   }
   document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
