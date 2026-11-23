@@ -107,9 +107,9 @@ button, input, textarea { font: inherit; color: inherit; }
 .kpis { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); border: 1px solid var(--border); border-radius: var(--radius-card); margin-bottom: var(--gap); }
 .kpi { padding: 14px 20px 16px; min-width: 0; }
 .kpi + .kpi { border-left: 1px solid var(--border); }
-.kpi .k { font-size: 13px; color: var(--muted); font-weight: 500; }
+.kpi .k { font-size: 13px; line-height: 18px; color: var(--muted); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .kpi .v { font-size: 28px; line-height: 36px; font-weight: 400; margin-top: 4px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.kpi .v small { font-size: 14px; color: var(--muted); margin-left: 4px; }
+.kpi .v small { font-size: 14px; line-height: 1; color: var(--muted); margin-left: 4px; }
 .kpi .s { font-size: 12px; color: var(--muted); line-height: 16px; margin-top: 2px; }
 .kpi .s.flag { color: var(--warning); font-weight: 500; }
 
@@ -264,6 +264,7 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
 @media (max-width: 1100px) {
   .grid2 { grid-template-columns: 1fr; }
   .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi .k { white-space: normal; }
   .kpi:nth-child(odd) { border-left: 0; }
   .kpi:nth-child(n + 3) { border-top: 1px solid var(--border); }
   .kpis[style*="--n: 5"] .kpi:last-child, .kpis[style*="--n:5"] .kpi:last-child { grid-column: 1 / -1; }
@@ -972,23 +973,23 @@ const DATA = /*@DATA@*/{};
   const STATS = S.map(endStats);                                 // tỷ lệ đầu thanh có lỗ hở / mép mỏng, mỗi cỡ
   const pct = x => Math.round(x * 100) + '%';
   const mm = (x, d = 1) => `${nf(x, d)}<small>mm</small>`;
-  const kpiHTML = (k, v, sub, flag) => `<div class="kpi"><div class="k">${k}</div><div class="v">${v}</div>${sub ? `<div class="s${flag ? ' flag' : ''}">${sub}</div>` : ''}</div>`;
+  const kpiHTML = (k, v, sub, flag) => `<div class="kpi"><div class="k" title="${k}">${k}</div><div class="v">${v}</div>${sub ? `<div class="s${flag ? ' flag' : ''}">${sub}</div>` : ''}</div>`;
 
   function renderKpis(s) {
     const nk = neck(s), br = bridge(s), mb = minBridge(s), thin = mb < s.tw;
     $('kpis').innerHTML = [
-      kpiHTML(T('Kích thước W × H', 'Size W × H'), `${nf(s.W)} × ${nf(s.H)}<small>mm</small>`, T('H = chiều dày lớp bê tông bảo vệ', 'H = concrete cover')),
-      kpiHTML(T('Chiều dày cánh / bụng', 'Flange / web thickness'), `${nf(s.tw)} / ${nf(s.ttop)}<small>mm</small>`, T(`vát góc trong ${nf(s.chamfer)} × 45°`, `inner chamfer ${nf(s.chamfer)} × 45°`)),
-      kpiHTML(T('Bước lỗ P', 'Hole pitch P'), mm(s.P), T(`hai cánh so le ${nf(s.P / 2)} mm`, `flanges staggered ${nf(s.P / 2)} mm`)),
-      kpiHTML(T('Khoảng cách mép lỗ nhỏ nhất', 'Min. edge distance'), mm(mb), thin ? T(`nhỏ hơn chiều dày cánh ${nf(s.tw)} mm`, `below flange thickness ${nf(s.tw)} mm`) : T(minEdge(s)[1][1], minEdge(s)[1][2]), thin),
-      kpiHTML(T('Tỷ lệ lỗ trên cánh', 'Flange open area'), `${nf(s.open, 0)}<small>%</small>`, T('diện tích lỗ / diện tích cánh', 'hole area / flange area')),
+      kpiHTML(T('Kích thước W × H', 'Size W × H'), `${nf(s.W)} × ${nf(s.H)}<small>mm</small>`, T('H = lớp bê tông bảo vệ', 'H = concrete cover')),
+      kpiHTML(Math.abs(s.tw - s.ttop) < 1e-9 ? T('Chiều dày thành', 'Wall thickness') : T('Dày cánh / bụng', 'Flange / web'), (Math.abs(s.tw - s.ttop) < 1e-9 ? nf(s.tw) : `${nf(s.tw)} / ${nf(s.ttop)}`) + '<small>mm</small>', T(`vát góc trong ${nf(s.chamfer)} × 45°`, `inner chamfer ${nf(s.chamfer)} × 45°`)),
+      kpiHTML(T('Bước lỗ P', 'Hole pitch P'), mm(s.P), T(`hai cánh so le ${nf(s.P / 2)} mm`, `flanges offset ${nf(s.P / 2)} mm`)),
+      kpiHTML(T('Cách mép lỗ nhỏ nhất', 'Min. edge distance'), mm(mb), thin ? T(`< chiều dày cánh ${nf(s.tw)} mm`, `< flange thickness ${nf(s.tw)} mm`) : T(minEdge(s)[1][1], minEdge(s)[1][2]), thin),
+      kpiHTML(T('Tỷ lệ lỗ trên cánh', 'Flange open area'), `${nf(s.open, 0)}<small>%</small>`, T('lỗ / diện tích cánh', 'holes / flange area')),
     ].join('');
   }
   function renderCutKpis(s, b, eR) {
     const st = STATS[cur];
     $('kpis-cut').innerHTML = [
-      kpiHTML(T('Đầu thanh có lỗ bị cắt hở', 'Bar ends with a hole cut open'), `${pct(st.cut)}`, T('khuyết vòm, lỗ tròn hoặc lỗ bụng', 'arch notch, round hole or web slot')),
-      kpiHTML(T('Đầu thanh có mép nhựa hẹp', 'Bar ends with a narrow strip'), `${pct(st.thin)}`, T(`hẹp hơn chiều dày cánh ${nf(s.tw)} mm`, `narrower than the flange, ${nf(s.tw)} mm`), st.thin > 0.3),
+      kpiHTML(T('Đầu thanh hở lỗ', 'Bar ends, hole open'), `${pct(st.cut)}`, T('khuyết vòm, lỗ tròn hoặc lỗ bụng', 'arch notch, round hole or web slot')),
+      kpiHTML(T('Đầu thanh mép hẹp', 'Bar ends, narrow strip'), `${pct(st.thin)}`, T(`hẹp hơn chiều dày cánh ${nf(s.tw)} mm`, `narrower than the flange, ${nf(s.tw)} mm`), st.thin > 0.3),
       kpiHTML(T('Bước lỗ P', 'Hole pitch P'), mm(s.P), T(`chiều dài cắt ${nf(L, 0)} mm`, `cut length ${nf(L, 0)} mm`)),
       kpiHTML(T(`Thanh ${selBar + 1} · e trái / phải`, `Bar ${selBar + 1} · e left / right`), `${nf(b.e)} / ${nf(eR)}<small>mm</small>`, T('tới tâm khuyết vòm cánh A gần nhất', 'to nearest flange A arch centre')),
     ].join('');
