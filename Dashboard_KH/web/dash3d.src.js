@@ -20,7 +20,7 @@ const KH = window.KH;
 // =====================================================================================
 const host = $('v3d');
 let renderer, scene, camera, controls, group, grid, mat, edgeMat, ok3d = false;
-let curLen = 2000, curView = 'iso', curParts = [], curKey = '';
+let curLen = 400, curView = 'iso', curParts = [], curKey = '';
 
 const viewerLabel = () => LT('Mô hình 3D thanh kê. Kéo để xoay, cuộn để phóng to; bằng bàn phím: phím mũi tên xoay, + và − phóng, Home về góc nhìn ban đầu', '3D model of the spacer. Drag to rotate, scroll to zoom; with the keyboard: arrow keys rotate, + and − zoom, Home resets the view');
 /** Điều khiển bằng bàn phím: mũi tên xoay quanh thanh, + / − phóng, Home (hoặc 0) về góc nhìn ban đầu. */

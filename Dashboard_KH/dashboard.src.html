@@ -428,8 +428,8 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
         <div class="panel-head">
           <div class="controls">
             <div class="seg" role="group" aria-label="Chiều dài hiển thị" data-en-aria="Displayed length">
-              <button type="button" data-len="2000" aria-pressed="true" data-en="2 m bar">Thanh 2 m</button>
-              <button type="button" data-len="400" aria-pressed="false" data-en="400 mm bar end">Đoạn 400 mm đầu thanh</button>
+              <button type="button" data-len="2000" aria-pressed="false" data-en="2 m bar">Thanh 2 m</button>
+              <button type="button" data-len="400" aria-pressed="true" data-en="400 mm bar end">Đoạn 400 mm đầu thanh</button>
             </div>
             <div class="seg" role="group" aria-label="Góc nhìn" data-en-aria="View">
               <button type="button" data-view="iso" aria-pressed="true" data-en="Isometric">Trục đo</button>
@@ -515,7 +515,7 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
         </div>
         <div class="actions">
           <button class="btn" type="button" id="btn-reset" data-en="Clear ticks">Bỏ đánh dấu</button>
-          <a class="btn primary" id="btn-mail" href="#">
+          <a class="btn primary" id="btn-mail" href="#" title="han@hancorporation.vn">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="1.5"/><path d="M4 7l8 6 8-6"/></svg><span data-en="Email the result">Gửi kết quả qua email</span></a>
         </div>
       </div>
@@ -1090,7 +1090,7 @@ const DATA = /*@DATA@*/{};
     $('nav-open').textContent = open || '';
     const body = [T(`Kết quả duyệt thiết kế thanh kê cốt thép PVC chữ U H20–H70 (bản ${DATA.date})`, `Design review result, PVC U-channel rebar spacer H20–H70 (issue ${DATA.date})`), '',
       ...IT.map(([id, t]) => `[${checked[id] ? 'x' : ' '}] ${t}`), '', T('Ghi chú:', 'Notes:'), note.value || T('(không)', '(none)')].join('\n');
-    $('btn-mail').href = 'mailto:?subject=' + encodeURIComponent(T('Xác nhận thiết kế thanh kê cốt thép PVC chữ U H20–H70', 'Design confirmation, PVC U-channel rebar spacer H20–H70')) + '&body=' + encodeURIComponent(body);
+    $('btn-mail').href = 'mailto:han@hancorporation.vn?subject=' + encodeURIComponent(T('Xác nhận thiết kế thanh kê cốt thép PVC chữ U H20–H70', 'Design confirmation, PVC U-channel rebar spacer H20–H70')) + '&body=' + encodeURIComponent(body);
   }
 
   // ---------- điều hướng (mỗi mục là một màn hình riêng, theo #hash)
