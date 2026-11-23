@@ -11,6 +11,7 @@ export const LAYERS = {
   TEXT: { color: 7, ltype: 'CONTINUOUS' },
   DETAIL: { color: 3, ltype: 'DASHED' },         // vòng chỉ và khung hình trích
   FRAME: { color: 7, ltype: 'CONTINUOUS' },      // khung bản vẽ, khung tên
+  CUT: { color: 7, ltype: 'CONTINUOUS' },        // vết cắt mặt cắt 1-1 và mũi tên chiều nhìn
   BUNG: { color: 7, ltype: 'CONTINUOUS' },       // 3D: bản bụng (mặt đỡ thép)
   CANH_A: { color: 4, ltype: 'CONTINUOUS' },     // 3D: cánh A
   CANH_B: { color: 6, ltype: 'CONTINUOUS' },     // 3D: cánh B
@@ -25,11 +26,13 @@ export class Dxf {
   ext(x, y, z = 0) { const p = [x, y, z]; for (let i = 0; i < 3; i++) { this.min[i] = Math.min(this.min[i], p[i]); this.max[i] = Math.max(this.max[i], p[i]); } }
   g(...a) { for (let i = 0; i < a.length; i += 2) this.out.push(String(a[i]), typeof a[i + 1] === 'number' ? n(a[i + 1]) : String(a[i + 1])); }
   line(L, x1, y1, x2, y2) { this.used.add(L); this.ext(x1, y1); this.ext(x2, y2); this.g(0, 'LINE', 8, L, 10, x1, 20, y1, 30, 0, 11, x2, 21, y2, 31, 0); }
-  poly(L, pts, closed = false) {
+  /** width > 0: nét dày (độ rộng đầu / cuối của POLYLINE), dùng cho vết cắt. */
+  poly(L, pts, closed = false, width = 0) {
     if (pts.length < 2) return;
-    if (pts.length === 2 && !closed) return this.line(L, pts[0][0], pts[0][1], pts[1][0], pts[1][1]);
+    if (pts.length === 2 && !closed && !(width > 0)) return this.line(L, pts[0][0], pts[0][1], pts[1][0], pts[1][1]);
     this.used.add(L);
     this.g(0, 'POLYLINE', 8, L, 66, 1, 10, 0, 20, 0, 30, 0, 70, closed ? 1 : 0);
+    if (width > 0) this.g(40, width, 41, width);
     for (const [x, y] of pts) { this.ext(x, y); this.g(0, 'VERTEX', 8, L, 10, x, 20, y, 30, 0); }
     this.g(0, 'SEQEND', 8, L);
   }

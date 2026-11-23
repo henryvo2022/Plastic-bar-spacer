@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Duyệt thiết kế · Thanh kê PVC chữ U</title>
+<title>Duyệt thiết kế · Thanh kê cốt thép PVC chữ U</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -154,6 +154,15 @@ svg.dwg .barrow:hover .rowbg { fill: var(--raised); }
 svg.dwg .barrow:focus { outline: none; }
 svg.dwg .barrow:focus-visible .rowbg, svg.dwg .barrow:focus-visible .selbg { stroke: var(--accent); stroke-width: 2; }
 
+
+/* tờ bản vẽ: luôn nền trắng, nét đen như giấy (cả khi giao diện tối) */
+.paper { --surface: #ffffff; --raised: #f4f6f7; --text: #131416; --muted: #5b5e60; --border: #d9dcde; --rule: #eceef0; --accent: #1b6c80; --ink: #131416; --active: #e3e7e8;
+  --sheet: #ffffff; --line: #1f1f1d; --hidden: #77756f; --center: #c2410c; --dimc: #1d5fbf; --mat: #dfe1e6; --hatch: #9a9da5; --void: #454850; --axis: #c3c6c9; --ink-2: #4f4e4a;
+  background: #ffffff; color: #131416; color-scheme: light; }
+svg.dwg .cutln { fill: none; stroke: var(--line); stroke-width: 2.6; stroke-linecap: butt; }
+svg.dwg .cutthin { fill: none; stroke: var(--line); stroke-width: .8; stroke-dasharray: 14 4 3 4; }
+svg.dwg .cutfill { fill: var(--line); stroke: none; }
+
 /* khung tên + thông số */
 .tblock { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--border); font-size: 13px; }
 .tblock > div { padding: 8px 20px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); min-width: 0; }
@@ -161,6 +170,7 @@ svg.dwg .barrow:focus-visible .rowbg, svg.dwg .barrow:focus-visible .selbg { str
 .tblock .k { font-size: 12px; color: var(--muted); }
 .tblock .v { font-weight: 500; }
 .tblock .wide { grid-column: span 2; }
+.tblock .full { grid-column: 1 / -1; }
 .kv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
 .kv > div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; min-height: 40px; padding: 9px 0; border-bottom: 1px solid var(--rule); }
 .kv dt { color: var(--muted); }
@@ -284,7 +294,7 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
   <aside class="side" id="side" aria-label="Điều hướng" data-en-aria="Navigation">
     <div class="brand">
       <svg viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" rx="7" fill="var(--accent)"/><path d="M7 21V8.5c0-.8.7-1.5 1.5-1.5h11c.8 0 1.5.7 1.5 1.5V21h-3.4v-9.6c0-.4-.3-.7-.7-.7h-5.8c-.4 0-.7.3-.7.7V21z" fill="#fff"/></svg>
-      <div><b data-en="PVC rebar spacer">Thanh kê PVC</b><span data-en="Client set · H20–H70">Bộ Mẫu KH · H20–H70</span></div>
+      <div><b data-en="PVC rebar spacer">Thanh kê cốt thép PVC</b><span data-en="Client set · H20–H70">Mẫu khách hàng · H20–H70</span></div>
       <button class="side-close" type="button" id="btn-close" aria-label="Đóng menu" data-en-aria="Close menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <nav class="nav" aria-label="Màn hình" data-en-aria="Screens">
@@ -303,7 +313,7 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
 
   <header class="top">
     <button class="menu-btn" type="button" id="btn-menu" aria-label="Mở menu" data-en-aria="Open menu" aria-controls="side" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-    <div class="crumb"><span data-en="Client set / ">Mẫu KH / </span><b id="crumb">Bản vẽ</b></div>
+    <div class="crumb"><span data-en="Client set / ">Mẫu khách hàng / </span><b id="crumb">Bản vẽ</b></div>
     <div class="seg lang" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-lang="vi" aria-pressed="true" title="Tiếng Việt">VI</button><button type="button" data-lang="en" aria-pressed="false" title="English">EN</button></div>
     <span class="sizes-label" id="sizes-label" data-en="Size">Cỡ</span>
     <div class="sizes" role="radiogroup" aria-label="Lọc theo cỡ" data-en-aria="Filter by size" id="tabs"></div>
@@ -325,8 +335,8 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
         </div>
       </div>
       <div class="kpis" id="kpis" style="--n: 5"></div>
-      <div class="panel">
-        <div class="panel-head"><h2 data-en="Drawing sheet">Tờ bản vẽ</h2><span class="meta" data-en="Partial view, 2.5 hole pitches · units mm">Hình vẽ trích đoạn 2,5 bước lỗ · đơn vị mm</span></div>
+      <div class="panel paper">
+        <div class="panel-head"><h2 data-en="Drawing sheet">Bản vẽ</h2><span class="meta" data-en="Partial view, 2.5 hole pitches · units mm">Hình vẽ trích đoạn 2,5 bước lỗ · đơn vị mm</span></div>
         <div class="dwg-scroll" style="padding: 0 12px 8px"><svg id="d-sheet" class="dwg" role="img"></svg></div>
         <p class="swipe" data-en="Swipe sideways to see the whole drawing.">Vuốt ngang để xem hết bản vẽ.</p>
         <div class="tblock" id="tblock"></div>
@@ -376,7 +386,7 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
       <div class="title-row">
         <div>
           <h1 id="h-cut" data-en="Bar ends at random cut positions">Đầu thanh khi cắt ngẫu nhiên</h1>
-          <p data-en="The profile is extruded and punched continuously at pitch P. The 2,000 mm cut-off is not synchronised with the punch, so each bar end falls anywhere within one hole pitch.">Profile đùn ép và dập lỗ liên tục theo bước P. Máy cắt thanh dài 2 000 mm không đồng bộ với khuôn dập, nên đầu thanh rơi vào vị trí bất kỳ trong một bước lỗ.</p>
+          <p data-en="The profile is extruded and punched continuously at pitch P. The 2,000 mm cut-off is not synchronised with the punch, so each bar end falls anywhere within one hole pitch.">Thanh được đùn ép và dập lỗ liên tục theo bước P. Máy cắt thanh dài 2 000 mm không đồng bộ với khuôn dập, nên đầu thanh rơi vào vị trí bất kỳ trong một bước lỗ.</p>
         </div>
         <div class="actions">
           <button class="btn primary" type="button" id="btn-rand">
@@ -392,10 +402,10 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
         </div>
         <div class="dwg-scroll" style="padding: 0 12px 12px"><svg id="d-over" class="dwg" role="img"></svg></div>
         <p class="swipe" data-en="Swipe sideways; tap a bar to select it.">Vuốt ngang để xem hết; bấm một thanh để chọn.</p>
-        <p class="hint" data-en="e = distance from the bar end to the nearest arch-opening centre on flange A, 0 ≤ e &amp;lt; P. The selected bar is shown on the 3D model screen.">e = khoảng cách từ đầu thanh tới tâm lỗ vòm gần nhất trên cánh A, 0 ≤ e &lt; P. Thanh đang chọn được hiển thị ở màn hình Mô hình 3D.</p>
+        <p class="hint" data-en="e = distance from the bar end to the nearest arch-opening centre on flange A, 0 ≤ e &amp;lt; P. The selected bar is shown on the 3D model screen.">e = khoảng cách từ đầu thanh tới tâm khuyết vòm gần nhất trên cánh A, 0 ≤ e &lt; P. Thanh đang chọn được hiển thị ở màn hình Mô hình 3D.</p>
       </div>
       <div class="panel">
-        <div class="panel-head"><h2 data-en="Bar ends with a strip narrower than the flange thickness">Tỷ lệ đầu thanh có dải nhựa hẹp hơn chiều dày cánh</h2><span class="meta" data-en="By size, over all cut positions">Theo cỡ, xét mọi vị trí cắt</span></div>
+        <div class="panel-head"><h2 data-en="Bar ends with a strip narrower than the flange thickness">Tỷ lệ đầu thanh có mép nhựa hẹp hơn chiều dày cánh</h2><span class="meta" data-en="By size, over all cut positions">Theo cỡ, xét mọi vị trí cắt</span></div>
         <div class="panel-body"><div class="chart" id="ch-thin"></div><p class="note" id="ch-thin-note">--</p></div>
       </div>
     </section>
@@ -421,8 +431,8 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
         <div class="tbl-wrap">
           <table>
             <thead><tr>
-              <th data-en="Size">Cỡ</th><th>W × H</th><th data-en="Flange / web t">Dày cánh / bụng</th><th data-en="Inner chamfer">Vát góc trong</th><th data-en="Arch opening">Lỗ vòm</th><th data-en="Round hole · centre ht">Lỗ tròn · tâm cao</th>
-              <th data-en="P / stagger">P / so le</th><th class="l" data-en="Web slot">Lỗ bụng</th><th data-en="Arch crown → web">Đỉnh lỗ vòm → bụng</th><th data-en="Arch ↔ round hole">Lỗ vòm ↔ lỗ tròn</th><th data-en="Flange open area">Tỷ lệ lỗ trên cánh</th>
+              <th data-en="Size">Cỡ</th><th>W × H</th><th data-en="Flange / web t">Dày cánh / bụng</th><th data-en="Inner chamfer">Vát góc trong</th><th data-en="Arch notch">Khuyết vòm</th><th data-en="Round hole · centre ht">Lỗ tròn · tâm cao</th>
+              <th data-en="P / stagger">P / so le</th><th class="l" data-en="Web slot">Lỗ bụng</th><th data-en="Arch crown → web">Đỉnh khuyết vòm → bụng</th><th data-en="Arch ↔ round hole">Khuyết vòm ↔ lỗ tròn</th><th data-en="Flange open area">Tỷ lệ lỗ trên cánh</th>
             </tr></thead>
             <tbody id="sum-body"></tbody>
           </table>
@@ -455,15 +465,15 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
             <div class="panel-head"><h2 data-en="Notes">Ghi chú gửi kèm</h2><span class="meta" id="note-saved"></span></div>
             <div class="panel-body">
               <label class="field-label" for="rev-note" data-en="Client comments">Ý kiến của khách hàng</label>
-              <textarea id="rev-note" placeholder="Ví dụ: đồng ý H50–H70; H30 đề nghị hạ lỗ vòm." data-en-ph="E.g. H50–H70 approved; H30: lower the arch opening."></textarea>
+              <textarea id="rev-note" placeholder="Ví dụ: đồng ý H50–H70; H30 đề nghị hạ khuyết vòm." data-en-ph="E.g. H50–H70 approved; H30: lower the arch notch."></textarea>
             </div>
           </div>
           <div class="panel">
             <div class="panel-head"><h2 data-en="Drawing conventions">Quy ước trên bản vẽ</h2></div>
             <ul class="conv">
-              <li data-en="&lt;b&gt;Web&lt;/b&gt;: the top plate carrying the rebar. &lt;b&gt;Flanges A and B&lt;/b&gt;: the two legs standing on the formwork. Holes in the two flanges are staggered by P/2."><b>Bụng</b> là bản trên đỡ thép; <b>cánh A, cánh B</b> là hai bản đứng tì lên ván khuôn. Lỗ trên hai cánh so le nhau P/2.</li>
-              <li data-en="&lt;b&gt;Web slots&lt;/b&gt; are concentric with the arch openings of flange A; the round holes of flange B share the same centre line."><b>Lỗ bụng</b> đồng tâm với lỗ vòm cánh A; lỗ tròn cánh B cùng đường tâm.</li>
-              <li data-en="&lt;b&gt;The cross-section&lt;/b&gt; is taken where there are no holes, i.e. the extrusion die profile."><b>Mặt cắt ngang</b> lấy tại vị trí không có lỗ, đúng biên dạng khuôn đùn.</li>
+              <li data-en="&lt;b&gt;Web&lt;/b&gt;: the top plate carrying the rebar. &lt;b&gt;Flanges A and B&lt;/b&gt;: the two legs standing on the formwork. Holes in the two flanges are staggered by P/2."><b>Bụng</b> là bản trên đỡ cốt thép; <b>cánh A, cánh B</b> là hai bản đứng tì lên ván khuôn. Lỗ trên hai cánh so le nhau P/2.</li>
+              <li data-en="&lt;b&gt;Web slots&lt;/b&gt; are concentric with the arch notchs of flange A; the round holes of flange B share the same centre line."><b>Lỗ bụng</b> đồng tâm với khuyết vòm cánh A; lỗ tròn cánh B cùng đường tâm.</li>
+              <li data-en="&lt;b&gt;Section 1-1&lt;/b&gt; is the extrusion profile before punching, i.e. the die shape; no section line can avoid the holes because the two flanges are staggered."><b>Mặt cắt 1-1</b> là biên dạng đùn trước khi dập lỗ, đúng hình dạng khuôn đùn; hai cánh so le nên không có vị trí nào cắt tránh hết lỗ.</li>
               <li data-en="&lt;b&gt;Weight and safety factors&lt;/b&gt; are not included yet; they will be added once the geometry is fixed."><b>Khối lượng và hệ số an toàn</b> chưa đưa vào; bổ sung sau khi chốt hình học.</li>
             </ul>
           </div>
@@ -541,8 +551,8 @@ const DATA = /*@DATA@*/{};
   // ---------- phân tích mặt cắt đầu thanh (đầu thanh tại x = 0, thanh nằm ở x > 0)
   function analyze(s, face, phi) {
     const P = s.P;
-    const feats = face === 'A' ? [{ n: 'lỗ vòm', res: phi, h: s.archW / 2 }, { n: 'lỗ tròn', res: phi + P / 2, h: s.d / 2 }]
-      : face === 'B' ? [{ n: 'lỗ vòm', res: phi + P / 2, h: s.archW / 2 }, { n: 'lỗ tròn', res: phi, h: s.d / 2 }]
+    const feats = face === 'A' ? [{ n: 'khuyết vòm', res: phi, h: s.archW / 2 }, { n: 'lỗ tròn', res: phi + P / 2, h: s.d / 2 }]
+      : face === 'B' ? [{ n: 'khuyết vòm', res: phi + P / 2, h: s.archW / 2 }, { n: 'lỗ tròn', res: phi, h: s.d / 2 }]
       : [{ n: 'lỗ bụng', res: phi, h: s.slotL / 2, P: s.slotP }];
     let best = null;
     for (const f of feats) {
@@ -646,23 +656,28 @@ const DATA = /*@DATA@*/{};
 
   // ---------- 1. tờ bản vẽ
   function drawSheet(svg, s) {
+    // Bố cục chiếu góc thứ nhất (TCVN / ISO-E): mặt đứng ở trên, mặt bằng nằm DƯỚI mặt đứng; mặt cắt 1-1 và chi tiết ở cột trái.
     svg.innerHTML = ''; const D = defs(svg), g = el('g', {}, svg);
     const P = s.P, W = s.W, H = s.H, win = 2.5 * P, RX = 300, SL = 580, k = SL / win;
-    const r1 = 100, r1b = r1 + W * k, r2 = r1b + 96, r2b = r2 + H * k, r3 = r2b + 100, r3b = r3 + H * k, DB = 128;
-    const VH = Math.max(r3b + 34, r3 + DB + 20) + 8;
+    const ra = 100, rab = ra + H * k, rb = rab + 100, rbb = rb + H * k, rp = rbb + 96, rpb = rp + W * k, DB = 128;
+    // chi tiết: tỷ lệ phóng chuẩn (10:1, 5:1, 2:1) so với hình chính, chọn tỷ lệ lớn nhất mà khung vẫn chứa đủ bề dày cánh
+    let ratio = 2; for (const r of [10, 5, 2]) { if (DB / (r * k) >= 3.0 * s.tw) { ratio = r; break; } }
+    const kd = ratio * k, span = DB / kd, dpts = profilePts(s, 16);
+    const ly = Math.max(rp - 74, rb + DB + 30), sy = ly + 28 + 6 * 22 + 8, lyEnd = sy + 62;
+    const VH = Math.max(rpb + 34, lyEnd) + 8;
     svg.setAttribute('viewBox', `0 0 1000 ${rd(VH)}`);
-    svg.dataset.k = k; svg.dataset.kd = DB / (3.2 * s.tw);      // tỷ lệ màn hình/mm (dùng khi xuất DXF)
-    const X = x => RX + x * k, ZT = z => r1b - z * k, YA = y => r2b - y * k, YB = y => r3b - y * k;
+    svg.dataset.k = k; svg.dataset.kd = kd; svg.dataset.ratio = ratio;      // dùng khi xuất DXF
+    const X = x => RX + x * k, YA = y => rab - y * k, YB = y => rbb - y * k, ZT = z => rpb - z * k;
     const ph = 0.5 * P, xE = X(win), rr = rrOf(s), R = archRof(s), c45 = Math.SQRT1_2;
 
-    // hình chiếu
-    topStrip(D, g, s, { X, Z: ZT, xa: 0, xb: win, phase: ph, ends: 'break' });
+    // các hình (mặt đứng cánh A, mặt đứng cánh B, mặt bằng bụng)
     wallStrip(D, g, s, { X, Y: YA, xa: 0, xb: win, phase: ph, ends: 'break' });
     wallStrip(D, g, s, { X, Y: YB, xa: 0, xb: win, phase: ph + P / 2, ends: 'break' });
+    topStrip(D, g, s, { X, Z: ZT, xa: 0, xb: win, phase: ph, ends: 'break' });
 
     // đường tâm
-    for (const c of [0.5 * P, 1.5 * P]) line(g, X(c), r1 - 6, X(c), r3b + 8, 'ctr');
-    for (const c of [P, 2 * P]) line(g, X(c), r2 - 6, X(c), r3b + 8, 'ctr');
+    for (const c of [0.5 * P, 1.5 * P]) line(g, X(c), ra - 6, X(c), rpb + 8, 'ctr');
+    for (const c of [P, 2 * P]) line(g, X(c), ra - 6, X(c), rbb + 8, 'ctr');
     line(g, X(0) - 8, ZT(W / 2), xE + 8, ZT(W / 2), 'ctr');
     if (s.d > 0) {
       const e = s.d / 2 * k + 7;
@@ -670,56 +685,67 @@ const DATA = /*@DATA@*/{};
       for (const c of [0.5 * P, 1.5 * P]) line(g, X(c) - e, YB(s.yh), X(c) + e, YB(s.yh), 'ctr');
     }
 
-    // tiêu đề
-    const slotTxt = s.slotType === 'oval' ? T(`oval (hai đầu R${nf(s.slotW / 2)})`, `obround (R${nf(s.slotW / 2)} ends)`) : T(`chữ nhật bo góc R${nf(rr)}`, `rounded rectangle R${nf(rr)}`);
-    title(g, RX, r1 - 74, T('HÌNH CHIẾU BẰNG — BỤNG', 'TOP VIEW — WEB'), T(`Lỗ bụng ${nf(s.slotL)} × ${nf(s.slotW)} ${slotTxt} · đồng tâm lỗ vòm cánh A · mép dưới là phía cánh A`, `Web slot ${nf(s.slotL)} × ${nf(s.slotW)} ${slotTxt} · concentric with flange A arch openings · lower edge = flange A side`));
-    title(g, RX, r2 - 72, T('HÌNH CHIẾU ĐỨNG — CÁNH A', 'FRONT ELEVATION — FLANGE A'), T(`Lỗ vòm ${nf(s.archW)} × ${nf(s.archH)} xen lỗ tròn Ø${nf(s.d)}, bước P = ${nf(P)}`, `Arch opening ${nf(s.archW)} × ${nf(s.archH)} alternating with round hole Ø${nf(s.d)}, pitch P = ${nf(P)}`));
-    title(g, RX, r3 - 60, T('HÌNH CHIẾU ĐỨNG — CÁNH B (nhìn từ phía cánh A)', 'ELEVATION — FLANGE B (seen from flange A side)'), T(`Lỗ như cánh A, so le ${nf(P / 2)} mm (P/2)`, `Same holes as flange A, staggered ${nf(P / 2)} mm (P/2)`));
-
-    // kích thước — lưng
-    const c1 = 1.5 * P;
-    dimH(D, g, X(c1 - s.slotL / 2), X(c1 + s.slotL / 2), r1 - 16, nf(s.slotL), { ya: ZT(W / 2) });
-    dimV(D, g, ZT(W / 2 + s.slotW / 2), ZT(W / 2 - s.slotW / 2), xE + 24, nf(s.slotW), { xa: xE + 2 });
-    dimV(D, g, ZT(W), ZT(0), xE + 50, nf(W), { xa: xE + 2 });
+    // vết cắt 1-1 trên mặt đứng cánh A (nhìn về phía đầu trái thanh)
     {
-      const px = 0.5 * P + s.slotL / 2 - rr + rr * c45, pz = W / 2 + s.slotW / 2 - rr + rr * c45;
-      leader(D, g, X(px), ZT(pz), X(0.5 * P + s.slotL / 2) + 26, r1 - 40, 'R' + nf(rr));
+      const xc = X(0.25 * P), yt = ra - 8, yb = rab + 12;
+      line(g, xc, ra - 14, xc, ra + 8, 'cutln'); line(g, xc, rab - 8, xc, rab + 14, 'cutln');
+      line(g, xc, ra + 8, xc, rab - 8, 'cutthin');
+      for (const y of [yt, yb]) {
+        line(g, xc, y, xc - 12, y, 'ln-s');
+        el('path', { d: `M${rd(xc - 21)},${rd(y)} L${rd(xc - 12)},${rd(y - 3.5)} L${rd(xc - 12)},${rd(y + 3.5)} Z`, class: 'cutfill' }, g);
+        txt(g, xc - 28, y + 4, '1', { class: 'tag', 'text-anchor': 'end' });
+      }
     }
-    // kích thước — thành A
-    dimH(D, g, X(0.5 * P), X(1.5 * P), r2 - 34, 'P = ' + nf(P), {});
-    dimH(D, g, X(0.5 * P), X(P), r2 - 14, nf(P / 2), {});
-    dimH(D, g, X(0.5 * P - s.archW / 2), X(0.5 * P + s.archW / 2), r2b + 22, nf(s.archW), { ya: YA(0) });
+
+    // tên hình
+    const slotTxt = s.slotType === 'oval' ? T(`oval (hai đầu R${nf(s.slotW / 2)})`, `obround (R${nf(s.slotW / 2)} ends)`) : T(`chữ nhật bo góc R${nf(rr)}`, `rounded rectangle R${nf(rr)}`);
+    title(g, RX, ra - 72, T('MẶT ĐỨNG — CÁNH A', 'ELEVATION — FLANGE A'), T(`Khuyết vòm ${nf(s.archW)} × ${nf(s.archH)} xen lỗ tròn Ø${nf(s.d)}, bước P = ${nf(P)}`, `Arch notch ${nf(s.archW)} × ${nf(s.archH)} alternating with round hole Ø${nf(s.d)}, pitch P = ${nf(P)}`));
+    title(g, RX, rb - 60, T('MẶT ĐỨNG — CÁNH B (nhìn từ phía cánh A)', 'ELEVATION — FLANGE B (seen from flange A side)'), T(`Lỗ như cánh A, so le ${nf(P / 2)} mm (P/2)`, `Same holes as flange A, staggered ${nf(P / 2)} mm (P/2)`));
+    title(g, RX, rp - 72, T('MẶT BẰNG — BỤNG', 'PLAN — WEB'), T(`Lỗ bụng ${nf(s.slotL)} × ${nf(s.slotW)} ${slotTxt} · đồng tâm khuyết vòm cánh A · mép dưới là phía cánh A`, `Web slot ${nf(s.slotL)} × ${nf(s.slotW)} ${slotTxt} · concentric with flange A arch notches · lower edge = flange A side`));
+
+    // kích thước — mặt đứng cánh A
+    const c1 = 1.5 * P;
+    dimH(D, g, X(0.5 * P), X(1.5 * P), ra - 34, 'P = ' + nf(P), {});
+    dimH(D, g, X(0.5 * P), X(P), ra - 14, nf(P / 2), {});
+    dimH(D, g, X(0.5 * P - s.archW / 2), X(0.5 * P + s.archW / 2), rab + 22, nf(s.archW), { ya: YA(0) });
     if (s.d > 0) dimV(D, g, YA(s.yh), YA(0), xE + 24, nf(s.yh), { xa: X(2 * P) + s.d / 2 * k, xb: xE + 2 });
     dimV(D, g, YA(s.archH), YA(0), xE + 50, nf(s.archH), { xa: X(c1 + s.archW / 2 - R), xb: xE + 2 });
-    dimV(D, g, YA(H), YA(0), xE + 76, nf(H), { xa: xE + 2, xb: xE + 2 });
-    if (s.d > 0) { const rr2 = s.d / 2 * k; leader(D, g, X(2 * P) + rr2 * c45, YA(s.yh) - rr2 * c45, X(2 * P) + rr2 + 30, r2 - 24, 'Ø' + nf(s.d)); }
+    dimV(D, g, YA(H), YA(0), xE + 76, `c = ${nf(H)} (${nf(H - 1)}÷${nf(H + 1)})`, { xa: xE + 2, xb: xE + 2 });
+    if (s.d > 0) { const rr2 = s.d / 2 * k; leader(D, g, X(2 * P) + rr2 * c45, YA(s.yh) - rr2 * c45, X(2 * P) + rr2 + 30, ra - 24, 'Ø' + nf(s.d)); }
     {
       const px = c1 + s.archW / 2 - R + R * c45, py = s.archH - R + R * c45;
       leader(D, g, X(px), YA(py), X(c1 + s.archW / 2) - 10, YA(s.archH * 0.34), 'R' + nf(R), 'end');
     }
-    // kích thước — thành B
-    dimH(D, g, X(0.5 * P), X(P), r3 - 16, T('so le ', 'stagger ') + nf(P / 2), {});
+    // kích thước — mặt đứng cánh B
+    dimH(D, g, X(0.5 * P), X(P), rb - 16, T('so le ', 'stagger ') + nf(P / 2), {});
+    // kích thước — mặt bằng
+    dimH(D, g, X(c1 - s.slotL / 2), X(c1 + s.slotL / 2), rp - 16, nf(s.slotL), { ya: ZT(W / 2) });
+    dimV(D, g, ZT(W / 2 + s.slotW / 2), ZT(W / 2 - s.slotW / 2), xE + 24, nf(s.slotW), { xa: xE + 2 });
+    dimV(D, g, ZT(W), ZT(0), xE + 50, nf(W), { xa: xE + 2 });
+    {
+      const px = 0.5 * P + s.slotL / 2 - rr + rr * c45, pz = W / 2 + s.slotW / 2 - rr + rr * c45;
+      leader(D, g, X(px), ZT(pz), X(0.5 * P + s.slotL / 2) + 26, rp - 40, 'R' + nf(rr));
+    }
 
-    // mặt cắt biên dạng (gióng với thành A)
+    // mặt cắt 1-1 (gióng với mặt đứng cánh A): biên dạng đùn, chưa kể lỗ dập
     const CX = 150, SX = z => CX + z * k, sf = (z, y) => [SX(z), YA(y)];
-    title(g, CX, r2 - 72, T('MẶT CẮT NGANG', 'CROSS-SECTION'), T('cùng tỷ lệ hình chiếu đứng', 'same scale as the elevation'), 'middle');
+    title(g, CX, ra - 72, T('MẶT CẮT 1-1', 'SECTION 1-1'), T('biên dạng đùn, chưa kể lỗ dập', 'extrusion profile, before punching'), 'middle');
     const dP = pathOf(profilePts(s), sf);
     el('path', { d: dP, class: 'mat' }, g); el('path', { d: dP, fill: D.hatch }, g); el('path', { d: dP, class: 'ln' }, g);
-    dimH(D, g, SX(-W / 2), SX(W / 2), r2 - 16, nf(W), { ya: YA(H) });
+    dimH(D, g, SX(-W / 2), SX(W / 2), ra - 16, nf(W), { ya: YA(H) });
     dimV(D, g, YA(H), YA(0), SX(-W / 2) - 18, nf(H), { xa: SX(-W / 2) });
-    dimH(D, g, SX(-W / 2), SX(-W / 2 + s.tw), r2b + 22, nf(s.tw), { ya: YA(0), side: 'left' });
+    dimH(D, g, SX(-W / 2), SX(-W / 2 + s.tw), rab + 22, nf(s.tw), { ya: YA(0), side: 'left' });
     dimV(D, g, YA(H), YA(H - s.ttop), SX(W / 4), nf(s.ttop), { side: 'below' });
-    txt(g, SX(-W / 2 + s.tw / 2), r2b + 50, T('CÁNH A', 'FLANGE A'), { class: 'tag', 'text-anchor': 'middle' });
-    txt(g, SX(W / 2 - s.tw / 2), r2b + 50, T('CÁNH B', 'FLANGE B'), { class: 'tag', 'text-anchor': 'middle' });
+    txt(g, SX(-W / 2 + s.tw / 2), rab + 50, T('CÁNH A', 'FLANGE A'), { class: 'tag', 'text-anchor': 'middle' });
+    txt(g, SX(W / 2 - s.tw / 2), rab + 50, T('CÁNH B', 'FLANGE B'), { class: 'tag', 'text-anchor': 'middle' });
     const cI = [SX(-W / 2 + s.tw), YA(H - s.ttop)], rI = Math.max(12, 1.4 * s.tw * k);
     el('circle', { cx: rd(cI[0]), cy: rd(cI[1]), r: rd(rI), class: 'callout' }, g);
-    txt(g, cI[0] + rI * 0.75 + 3, cI[1] + rI * 0.75 + 12, 'I', { class: 'tag' });
+    txt(g, cI[0] + rI * 0.75 + 3, cI[1] + rI * 0.75 + 12, '1', { class: 'tag' });
     const cII = [SX(-W / 2 + s.tw / 2), YA(0)], rII = Math.max(10, 1.1 * s.tw * k);
     el('circle', { cx: rd(cII[0]), cy: rd(cII[1]), r: rd(rII), class: 'callout' }, g);
-    txt(g, cII[0] + rII + 4, cII[1] - rII + 4, 'II', { class: 'tag' });
+    txt(g, cII[0] + rII + 4, cII[1] - rII + 4, '2', { class: 'tag' });
 
-    // chi tiết I, II
-    const span = 3.2 * s.tw, kd = DB / span, dpts = profilePts(s, 16);
+    // chi tiết 1, 2 (tỷ lệ chuẩn so với hình chính)
     const detail = (bx, by, z0, y1, name, sub, extra) => {
       const DX = z => bx + (z - z0) * kd, DY = y => by + (y1 - y) * kd, f = (z, y) => [DX(z), DY(y)];
       txt(g, bx, by - 22, name, { class: 'ttl' }); txt(g, bx, by - 8, sub, { class: 'sb' });
@@ -728,32 +754,36 @@ const DATA = /*@DATA@*/{};
       el('path', { d, class: 'mat' }, cg); el('path', { d, fill: D.hatch }, cg); el('path', { d, class: 'ln' }, cg);
       extra(DX, DY, bx, by);
     };
-    const zoomTxt = ` · ×${nf(kd / k)}`;
-    detail(12, r3, -W / 2 - 0.5 * s.tw, H + 0.5 * s.tw, T('HÌNH TRÍCH I', 'DETAIL I'), T('vát góc trong 45°', 'inner chamfer 45°') + zoomTxt,(DX, DY, bx, by) => {
+    const zoomTxt = T(' · TL ', ' · ') + ratio + ':1';
+    detail(12, rb, -W / 2 - 0.5 * s.tw, H + 0.5 * s.tw, T('CHI TIẾT 1', 'DETAIL 1'), T('vát góc trong 45°', 'inner chamfer 45°') + zoomTxt, (DX, DY, bx, by) => {
       dimH(D, g, DX(-W / 2), DX(-W / 2 + s.tw), by + DB - 14, nf(s.tw), {});
       dimV(D, g, DY(H), DY(H - s.ttop), DX(-W / 2 + 2.0 * s.tw), nf(s.ttop), {});
       const zc = -W / 2 + s.tw + s.chamfer / 2, yc = H - s.ttop - s.chamfer / 2;
       leader(D, g, DX(zc), DY(yc), bx + 120, by + 94, `${nf(s.chamfer)}×45°`, 'end');
     });
-    detail(150, r3, -W / 2 - 0.5 * s.tw, 2.7 * s.tw, T('HÌNH TRÍCH II', 'DETAIL II'), T('bo mép chân cánh', 'flange foot radius') + zoomTxt,(DX, DY, bx, by) => {
-      const rf = Math.min(s.footR, s.tw / 2), ex = bx + 100, ey = by + 46;
+    detail(150, rb, -W / 2 - 0.5 * s.tw, span - 0.5 * s.tw, T('CHI TIẾT 2', 'DETAIL 2'), T('bo mép chân cánh', 'flange foot radius') + zoomTxt, (DX, DY, bx, by) => {
+      const rf = Math.min(s.footR, s.tw / 2), ex = bx + 100, ey = DY(0) - 40;
       leader(D, g, DX(-W / 2 + rf - rf * c45), DY(rf - rf * c45), ex, ey, 'R' + nf(rf, 2));
       el('path', { d: `M${rd(DX(-W / 2 + s.tw - rf + rf * c45))},${rd(DY(rf - rf * c45))} L${rd(ex)},${rd(ey)}`, class: 'dim', 'marker-start': D.ar }, g);
       line(g, bx + 4, DY(0), bx + DB - 4, DY(0), 'hid');
       txt(g, bx + DB - 6, DY(0) + 15, T('mặt ván khuôn', 'formwork face'), { class: 'sb', 'text-anchor': 'end' });
     });
 
-    // ký hiệu
-    txt(g, 20, r1 - 74, T('KÝ HIỆU NÉT', 'LINE TYPES'), { class: 'ttl' });
+    // ký hiệu nét
+    txt(g, 20, ly, T('KÝ HIỆU NÉT', 'LINE TYPES'), { class: 'ttl' });
     [['ln', T('Đường bao thấy', 'Visible outline')], ['hid', T('Đường bao khuất', 'Hidden outline')], ['ctr', T('Đường tâm', 'Centre line')], ['dim', T('Đường kích thước (mm)', 'Dimension line (mm)')]].forEach(([c, t], i) => {
-      const y = r1 - 46 + i * 22;
+      const y = ly + 28 + i * 22;
       line(g, 20, y, 62, y, c, c === 'dim' ? { 'marker-start': D.ar, 'marker-end': D.ar } : {});
       txt(g, 72, y + 4, t);
     });
-    { const y = r1 - 46 + 4 * 22; el('rect', { x: 20, y: y - 7, width: 42, height: 14, class: 'mat' }, g); el('rect', { x: 20, y: y - 7, width: 42, height: 14, fill: D.hatch }, g); el('rect', { x: 20, y: y - 7, width: 42, height: 14, class: 'ln-s' }, g); txt(g, 72, y + 4, T('Ký hiệu vật liệu mặt cắt', 'Section hatching')); }
-    { const y = r1 - 46 + 5 * 22; breakLine(g, 41, y - 7, y + 7); txt(g, 72, y + 4, T('Đường cắt lìa', 'Break line')); }
+    { const y = ly + 28 + 4 * 22; el('rect', { x: 20, y: y - 7, width: 42, height: 14, class: 'mat' }, g); el('rect', { x: 20, y: y - 7, width: 42, height: 14, fill: D.hatch }, g); el('rect', { x: 20, y: y - 7, width: 42, height: 14, class: 'ln-s' }, g); txt(g, 72, y + 4, T('Ký hiệu vật liệu mặt cắt', 'Section hatching')); }
+    { const y = ly + 28 + 5 * 22; breakLine(g, 41, y - 7, y + 7); txt(g, 72, y + 4, T('Đường cắt lìa', 'Break line')); }
+    // ký hiệu phương pháp chiếu góc thứ nhất: mặt đứng hình thang bên trái, mặt bên (hai vòng tròn) bên phải
+    el('path', { d: `M20,${rd(sy + 30)} L48,${rd(sy + 30)} L42,${rd(sy + 10)} L26,${rd(sy + 10)} Z`, class: 'ln-s' }, g);
+    el('circle', { cx: 86, cy: rd(sy + 20), r: 10, class: 'ln-s' }, g); el('circle', { cx: 86, cy: rd(sy + 20), r: 5, class: 'ln-s' }, g);
+    txt(g, 20, sy + 52, T('Chiếu góc thứ nhất', 'First-angle projection'), { class: 'sb' });
 
-    svg.setAttribute('aria-label', LANG === 'en' ? `Drawing H${H}: section ${W}×${H}, flange ${s.tw}, web ${s.ttop}, chamfer ${s.chamfer}×45°, foot R${s.footR}; flange A arch ${s.archW}×${s.archH} R${R}, round hole Ø${s.d} at ${s.yh}, pitch ${P}; flange B staggered ${P / 2}; web slot ${s.slotL}×${s.slotW}` : `Bản vẽ H${H}: mặt cắt ${W}×${H}, cánh ${s.tw}, bụng ${s.ttop}, vát ${s.chamfer}×45°, chân R${s.footR}; cánh A lỗ vòm ${s.archW}×${s.archH} R${R}, lỗ tròn Ø${s.d} tâm cao ${s.yh}, bước ${P}; cánh B so le ${P / 2}; lỗ bụng ${s.slotL}×${s.slotW}`);
+    svg.setAttribute('aria-label', LANG === 'en' ? `Drawing H${H}: section ${W}×${H}, flange ${s.tw}, web ${s.ttop}, chamfer ${s.chamfer}×45°, foot R${s.footR}; flange A arch notch ${s.archW}×${s.archH} R${R}, round hole Ø${s.d} at ${s.yh}, pitch ${P}; flange B staggered ${P / 2}; web slot ${s.slotL}×${s.slotW}; cover c = ${H} (${H - 1}-${H + 1})` : `Bản vẽ H${H}: mặt cắt ${W}×${H}, cánh ${s.tw}, bụng ${s.ttop}, vát ${s.chamfer}×45°, chân R${s.footR}; cánh A khuyết vòm ${s.archW}×${s.archH} R${R}, lỗ tròn Ø${s.d} tâm cao ${s.yh}, bước ${P}; cánh B so le ${P / 2}; lỗ bụng ${s.slotL}×${s.slotW}; lớp bảo vệ c = ${H} (${H - 1}÷${H + 1})`);
   }
 
   // ---------- 2. thanh cắt ngẫu nhiên
@@ -781,7 +811,7 @@ const DATA = /*@DATA@*/{};
       grp.addEventListener('click', pick);
       grp.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); svg.querySelectorAll('.barrow')[i]?.focus(); } });
     });
-    svg.setAttribute('aria-label', T(`3 thanh dài ${L} mm cắt ngẫu nhiên, hình chiếu đứng cánh A`, `3 bars of ${L} mm cut at random, flange A elevation`));
+    svg.setAttribute('aria-label', T(`3 thanh dài ${L} mm cắt ngẫu nhiên, mặt đứng cánh A`, `3 bars of ${L} mm cut at random, flange A elevation`));
   }
 
 
@@ -806,8 +836,8 @@ const DATA = /*@DATA@*/{};
   const slotGap = s => s.slotP - s.slotL;                        // khoảng cách giữa 2 lỗ bụng
   // mọi khoảng cách mép lỗ, kèm tên hiển thị [vi, en, câu vi, câu en]
   const EDGES = [
-    [neck, 'đỉnh lỗ vòm → bụng', 'arch crown → web', 'từ đỉnh lỗ vòm tới mặt dưới bụng', 'from the arch crown to the web underside'],
-    [bridge, 'lỗ vòm ↔ lỗ tròn', 'arch ↔ round hole', 'giữa lỗ vòm và lỗ tròn', 'between the arch opening and the round hole'],
+    [neck, 'đỉnh khuyết vòm → bụng', 'arch crown → web', 'từ đỉnh khuyết vòm tới mặt dưới bụng', 'from the arch crown to the web underside'],
+    [bridge, 'khuyết vòm ↔ lỗ tròn', 'arch ↔ round hole', 'giữa khuyết vòm và lỗ tròn', 'between the arch notch and the round hole'],
     [holeTop, 'đỉnh lỗ tròn → bụng', 'round hole → web', 'từ đỉnh lỗ tròn tới mặt dưới bụng', 'from the round hole to the web underside'],
     [holeBot, 'đáy lỗ tròn → mặt ván', 'round hole → formwork', 'từ đáy lỗ tròn tới mặt ván khuôn', 'from the round hole to the formwork face'],
     [slotGap, 'giữa 2 lỗ bụng', 'between web slots', 'giữa hai lỗ bụng', 'between two web slots'],
@@ -832,34 +862,39 @@ const DATA = /*@DATA@*/{};
   function renderCutKpis(s, b, eR) {
     const st = STATS[cur];
     $('kpis-cut').innerHTML = [
-      kpiHTML(T('Đầu thanh có lỗ bị cắt hở', 'Bar ends with a hole cut open'), `${pct(st.cut)}`, T('lỗ vòm, lỗ tròn hoặc lỗ bụng', 'arch opening, round hole or web slot')),
-      kpiHTML(T('Đầu thanh có dải nhựa hẹp', 'Bar ends with a narrow strip'), `${pct(st.thin)}`, T(`hẹp hơn chiều dày cánh ${nf(s.tw)} mm`, `narrower than the flange, ${nf(s.tw)} mm`), st.thin > 0.3),
+      kpiHTML(T('Đầu thanh có lỗ bị cắt hở', 'Bar ends with a hole cut open'), `${pct(st.cut)}`, T('khuyết vòm, lỗ tròn hoặc lỗ bụng', 'arch notch, round hole or web slot')),
+      kpiHTML(T('Đầu thanh có mép nhựa hẹp', 'Bar ends with a narrow strip'), `${pct(st.thin)}`, T(`hẹp hơn chiều dày cánh ${nf(s.tw)} mm`, `narrower than the flange, ${nf(s.tw)} mm`), st.thin > 0.3),
       kpiHTML(T('Bước lỗ P', 'Hole pitch P'), mm(s.P), T(`chiều dài cắt ${nf(L, 0)} mm`, `cut length ${nf(L, 0)} mm`)),
-      kpiHTML(T(`Thanh ${selBar + 1} · e trái / phải`, `Bar ${selBar + 1} · e left / right`), `${nf(b.e)} / ${nf(eR)}<small>mm</small>`, T('tới tâm lỗ vòm cánh A gần nhất', 'to nearest flange A arch centre')),
+      kpiHTML(T(`Thanh ${selBar + 1} · e trái / phải`, `Bar ${selBar + 1} · e left / right`), `${nf(b.e)} / ${nf(eR)}<small>mm</small>`, T('tới tâm khuyết vòm cánh A gần nhất', 'to nearest flange A arch centre')),
     ].join('');
   }
 
   function renderSpecs(s) {
     $('t-code').textContent = s.code; $('t3-code').textContent = s.code;
-    $('t-size').textContent = T(`Thanh kê chữ U ${nf(s.W)} × ${nf(s.H)} mm`, `U-channel spacer ${nf(s.W)} × ${nf(s.H)} mm`);
+    $('t-size').textContent = T(`Thanh kê cốt thép chữ U ${nf(s.W)} × ${nf(s.H)} mm`, `U-channel spacer ${nf(s.W)} × ${nf(s.H)} mm`);
     const nk = neck(s), br = bridge(s);
     const f = $('t-finding');
-    if (minBridge(s) < s.tw) f.innerHTML = T(`<span class="flag">Đỉnh lỗ vòm chỉ cách mặt dưới bụng ${nf(nk)} mm</span>, nhỏ hơn chiều dày cánh ${nf(s.tw)} mm; dải nhựa này dễ nứt khi dập.`, `<span class="flag">The arch crown is only ${nf(nk)} mm below the web underside</span>, less than the flange thickness ${nf(s.tw)} mm; this strip may crack during punching.`);
+    if (minBridge(s) < s.tw) f.innerHTML = T(`<span class="flag">Đỉnh khuyết vòm chỉ cách mặt dưới bụng ${nf(nk)} mm</span>, nhỏ hơn chiều dày cánh ${nf(s.tw)} mm; mép nhựa này dễ nứt khi dập.`, `<span class="flag">The arch crown is only ${nf(nk)} mm below the web underside</span>, less than the flange thickness ${nf(s.tw)} mm; this strip may crack during punching.`);
     else f.innerHTML = T(`Khoảng cách mép lỗ đều không nhỏ hơn chiều dày cánh ${nf(s.tw)} mm; nhỏ nhất <b>${nf(minBridge(s))} mm</b> ${minEdge(s)[1][3]}.`, `All edge distances are at least the flange thickness ${nf(s.tw)} mm; the minimum is <b>${nf(minBridge(s))} mm</b> ${minEdge(s)[1][4]}.`);
     renderKpis(s);
     const tb = $('tblock'); tb.innerHTML = '';
-    [[T('Sản phẩm', 'Product'), T('Thanh kê PVC chữ U', 'PVC U-channel rebar spacer')], [T('Mã', 'Code'), s.code], [T('Cỡ W × H', 'Size W × H'), `${nf(s.W)} × ${nf(s.H)} mm`], [T('Vật liệu', 'Material'), T('uPVC tái chế', 'Recycled uPVC')],
-     [T('Công nghệ', 'Process'), T('Đùn ép profile, dập lỗ liên tục', 'Profile extrusion, continuous punching'), 'wide'], [T('Chiều dài thanh', 'Bar length'), T(`${nf(L, 0)} mm, vị trí lỗ ở đầu thanh ngẫu nhiên`, `${nf(L, 0)} mm, random hole position at bar ends`), 'wide'],
-     [T('Đơn vị', 'Units'), 'mm'], [T('Trạng thái', 'Status'), T('Bản duyệt thiết kế', 'Design review issue')], [T('Ngày lập', 'Date'), DATA.date], [T('Dung sai', 'Tolerances'), T('Chờ thống nhất', 'To be agreed')]].forEach(([k, v, cls]) => {
+    const sheetNo = `${s.code}-BV01`;
+    [[T('Sản phẩm', 'Product'), T('Thanh kê cốt thép PVC chữ U', 'PVC U-channel rebar spacer'), 'wide'], [T('Mã / kích thước', 'Code / size'), `${s.code} · ${nf(s.W)} × ${nf(s.H)} mm`, 'wide'],
+     [T('Số hiệu bản vẽ', 'Drawing no.'), sheetNo], [T('Lần sửa đổi', 'Revision'), 'A'], [T('Giai đoạn', 'Stage'), T('Duyệt thiết kế', 'Design review')], [T('Tờ', 'Sheet'), '1/1'],
+     [T('Vật liệu', 'Material'), T('uPVC tái chế', 'Recycled uPVC')], [T('Công nghệ', 'Process'), T('Đùn ép biên dạng, dập lỗ liên tục', 'Profile extrusion, continuous punching'), 'wide'], [T('Ngày lập', 'Date'), DATA.date],
+     [T('Chiều dài thanh', 'Bar length'), T(`${nf(L, 0)} mm, vị trí lỗ ở đầu thanh ngẫu nhiên`, `${nf(L, 0)} mm, random hole position at bar ends`), 'wide'], [T('Phương pháp chiếu', 'Projection'), T('Góc thứ nhất', 'First angle')], [T('Đơn vị', 'Units'), 'mm'],
+     [T('Tỷ lệ', 'Scale'), T('Hình trên màn hình / bản in không theo tỷ lệ: đọc theo số ghi. File DXF vẽ 1:1.', 'On-screen and printed views are not to scale: use the dimensions. The DXF file is drawn 1:1.'), 'wide'],
+     [T('Dung sai', 'Tolerances'), T('Lớp bảo vệ c = H ±1 mm (đề xuất). Kích thước khác: chờ thống nhất.', 'Cover c = H ±1 mm (proposed). Other dimensions: to be agreed.'), 'wide'],
+     [T('Lập / Kiểm / Duyệt', 'Drawn / Checked / Approved'), '……………… / ……………… / ………………', 'full']].forEach(([k, v, cls]) => {
       const d = document.createElement('div'); if (cls) d.className = cls;
       d.innerHTML = '<div class="k"></div><div class="v"></div>'; d.children[0].textContent = k; d.children[1].textContent = v; tb.appendChild(d);
     });
     const rr = rrOf(s), sp = $('specs'); sp.innerHTML = '';
     [[T('Kích thước W × H', 'Size W × H'), `${nf(s.W)} × ${nf(s.H)} mm`], [T('Chiều dày cánh / bụng', 'Flange / web thickness'), `${nf(s.tw)} / ${nf(s.ttop)} mm`],
-     [T('Vát góc trong / bo mép chân', 'Inner chamfer / foot radius'), `${nf(s.chamfer)} × 45° / R${nf(s.footR)}`], [T('Lỗ vòm (rộng × cao)', 'Arch opening (w × h)'), `${nf(s.archW)} × ${nf(s.archH)} mm, R${nf(archRof(s))}`],
+     [T('Vát góc trong / bo mép chân', 'Inner chamfer / foot radius'), `${nf(s.chamfer)} × 45° / R${nf(s.footR)}`], [T('Khuyết vòm (rộng × cao)', 'Arch notch (w × h)'), `${nf(s.archW)} × ${nf(s.archH)} mm, R${nf(archRof(s))}`],
      [T('Lỗ tròn', 'Round hole'), T(`Ø${nf(s.d)}, tâm cao ${nf(s.yh)} mm`, `Ø${nf(s.d)}, centre height ${nf(s.yh)} mm`)], [T('Bước lỗ P / so le', 'Hole pitch P / stagger'), `${nf(s.P)} / ${nf(s.P / 2)} mm`],
      [T('Lỗ bụng', 'Web slot'), `${nf(s.slotL)} × ${nf(s.slotW)} mm, ${s.slotType === 'oval' ? T('oval', 'obround') : T('bo góc R', 'corner R') + nf(rr)}`], [T('Tỷ lệ lỗ trên cánh', 'Flange open area'), `${nf(s.open, 0)}%`],
-     [T('Đỉnh lỗ vòm → mặt dưới bụng', 'Arch crown → web underside'), `${nf(nk)} mm`, nk < s.tw], [T('Mép lỗ vòm → mép lỗ tròn', 'Arch edge → round hole edge'), `${nf(br)} mm`, br < s.tw],
+     [T('Đỉnh khuyết vòm → mặt dưới bụng', 'Arch crown → web underside'), `${nf(nk)} mm`, nk < s.tw], [T('Mép khuyết vòm → mép lỗ tròn', 'Arch edge → round hole edge'), `${nf(br)} mm`, br < s.tw],
      [T('Đỉnh lỗ tròn → mặt dưới bụng', 'Round hole → web underside'), `${nf(holeTop(s))} mm`, holeTop(s) < s.tw], [T('Đáy lỗ tròn → mặt ván', 'Round hole → formwork face'), `${nf(holeBot(s))} mm`, holeBot(s) < s.tw],
      [T('Mép lỗ bụng → mép ngoài', 'Web slot edge → outer edge'), `${nf((s.W - s.slotW) / 2)} mm`], [T('Khoảng cách 2 lỗ bụng', 'Gap between web slots'), `${nf(s.slotP - s.slotL)} mm`]].forEach(([k, v, w]) => {
       const row = document.createElement('div');
@@ -877,7 +912,7 @@ const DATA = /*@DATA@*/{};
     Charts.bars(fresh($('ch-thin')), { labels, values: STATS.map(x => x.thin), highlight: cur, height: 200,
       format: Charts.fmt.pct(0), tickFormat: Charts.fmt.pct(0) });
     const worst = STATS.reduce((m, x, i) => x.thin > STATS[m].thin ? i : m, 0);
-    $('ch-thin-note').textContent = T(`H${S[cur].H}: ${pct(STATS[cur].thin)} số đầu thanh có dải nhựa hẹp hơn chiều dày cánh. Cao nhất là H${S[worst].H} (${pct(STATS[worst].thin)}).`, `H${S[cur].H}: ${pct(STATS[cur].thin)} of bar ends have a strip narrower than the flange thickness. Highest: H${S[worst].H} (${pct(STATS[worst].thin)}).`);
+    $('ch-thin-note').textContent = T(`H${S[cur].H}: ${pct(STATS[cur].thin)} số đầu thanh có mép nhựa hẹp hơn chiều dày cánh. Cao nhất là H${S[worst].H} (${pct(STATS[worst].thin)}).`, `H${S[cur].H}: ${pct(STATS[cur].thin)} of bar ends have a strip narrower than the flange thickness. Highest: H${S[worst].H} (${pct(STATS[worst].thin)}).`);
     Charts.bars(fresh($('ch-bridge')), { labels, values: S.map(s => +(minBridge(s) / s.tw).toFixed(2)), highlight: cur, height: 220,
       format: v => nf2(v) + T(' lần', '×'), tickFormat: v => nf(v, 1), reference: { value: 1, label: T('bằng chiều dày cánh', 'equal to flange thickness') } });
   }
@@ -948,18 +983,18 @@ const DATA = /*@DATA@*/{};
   const items = () => {
     const out = [
       ['bien-dang', T('Mặt cắt ngang', 'Cross-section'), T('W × H, chiều dày cánh và bụng, vát góc trong 45°, bo mép chân R0,5 của từng cỡ.', 'W × H, flange and web thickness, 45° inner chamfer and R0.5 foot radius of each size.')],
-      ['lo-thanh', T('Lỗ trên cánh', 'Flange holes'), T('Lỗ vòm xen lỗ tròn, bước P; hai cánh so le P/2.', 'Arch openings alternating with round holes at pitch P; flanges staggered by P/2.')],
-      ['lo-lung', T('Lỗ bụng', 'Web slots'), T('Kích thước, kiểu bo góc / oval, đồng tâm lỗ vòm cánh A.', 'Size, rounded / obround shape, concentric with the flange A arch openings.')],
+      ['lo-thanh', T('Lỗ trên cánh', 'Flange holes'), T('Khuyết vòm xen lỗ tròn, bước P; hai cánh so le P/2.', 'Arch notchs alternating with round holes at pitch P; flanges staggered by P/2.')],
+      ['lo-lung', T('Lỗ bụng', 'Web slots'), T('Kích thước, kiểu bo góc / oval, đồng tâm khuyết vòm cánh A.', 'Size, rounded / obround shape, concentric with the flange A arch notchs.')],
       ['dau-thanh', T('Đầu thanh', 'Bar ends'), T('Lỗ dập liên tục nên lỗ ở hai đầu thanh có thể bị cắt hở; không có đoạn đặc ở đầu thanh.', 'Holes are punched continuously, so holes at both bar ends may be cut open; there is no solid zone at the ends.')],
-      ['dung-sai', T(`Chiều dài thanh ${nf(L, 0)} mm và dung sai`, `Bar length ${nf(L, 0)} mm and tolerances`), T('Dung sai chiều dài thanh, bước lỗ P và kích thước lỗ.', 'Tolerances on bar length, hole pitch P and hole sizes.')],
+      ['dung-sai', T(`Chiều dài thanh ${nf(L, 0)} mm và dung sai`, `Bar length ${nf(L, 0)} mm and tolerances`), T('Lớp bê tông bảo vệ c = H ±1 mm (đề xuất theo mốc thị trường); dung sai chiều dài thanh, bước lỗ P và kích thước lỗ.', 'Concrete cover c = H ±1 mm (proposed from market benchmark); tolerances on bar length, hole pitch P and hole sizes.')],
     ];
-    if (flg.length) out.push(['co-vom', T(`Đỉnh lỗ vòm ${flg.map(s => 'H' + s.H).join(', ')}`, `Arch crown ${flg.map(s => 'H' + s.H).join(', ')}`),
+    if (flg.length) out.push(['co-vom', T(`Đỉnh khuyết vòm ${flg.map(s => 'H' + s.H).join(', ')}`, `Arch crown ${flg.map(s => 'H' + s.H).join(', ')}`),
       T(`Chỉ cách mặt dưới bụng ${flg.map(s => nf(neck(s)) + ' mm').join(', ')}, nhỏ hơn chiều dày cánh; chấp nhận hoặc yêu cầu sửa.`, `Only ${flg.map(s => nf(neck(s)) + ' mm').join(', ')} below the web underside, less than the flange thickness; accept or request a change.`)]);
-    // lỗ tròn cao hơn đỉnh lỗ vòm (bộ đề xuất theo KUM, 23/11/2026) — lệch quy tắc "đỉnh vòm ngang đỉnh lỗ tròn" khách chọn trước đó
+    // lỗ tròn cao hơn đỉnh khuyết vòm (bộ đề xuất theo KUM, 23/11/2026) — lệch quy tắc "đỉnh vòm ngang đỉnh lỗ tròn" khách chọn trước đó
     const up = S.filter(s => s.yh + s.d / 2 > s.archH + 0.05);
-    if (up.length) out.push(['lo-tron-cao', T(`Lỗ tròn cao hơn lỗ vòm: ${up.map(s => 'H' + s.H).join(', ')}`, `Round hole above arch crown: ${up.map(s => 'H' + s.H).join(', ')}`),
-      T(`Lỗ vòm hạ thấp để tăng sức chịu tải, lỗ tròn giữ kích thước nên đỉnh lỗ tròn cao hơn đỉnh lỗ vòm (${up.map(s => `H${s.H}: ${nf(s.yh + s.d / 2)} / ${nf(s.archH)} mm`).join('; ')}). Xác nhận bỏ quy tắc "đỉnh lỗ vòm ngang đỉnh lỗ tròn".`,
-        `Arch openings were lowered for load capacity while the round holes kept their size, so the round hole tops sit above the arch crowns (${up.map(s => `H${s.H}: ${nf(s.yh + s.d / 2)} / ${nf(s.archH)} mm`).join('; ')}). Confirm dropping the "arch crown level with round hole top" rule.`)]);
+    if (up.length) out.push(['lo-tron-cao', T(`Lỗ tròn cao hơn khuyết vòm: ${up.map(s => 'H' + s.H).join(', ')}`, `Round hole above arch crown: ${up.map(s => 'H' + s.H).join(', ')}`),
+      T(`Khuyết vòm hạ thấp để tăng sức chịu tải, lỗ tròn giữ kích thước nên đỉnh lỗ tròn cao hơn đỉnh khuyết vòm (${up.map(s => `H${s.H}: ${nf(s.yh + s.d / 2)} / ${nf(s.archH)} mm`).join('; ')}). Xác nhận bỏ quy tắc "đỉnh khuyết vòm ngang đỉnh lỗ tròn".`,
+        `Arch notchs were lowered for load capacity while the round holes kept their size, so the round hole tops sit above the arch crowns (${up.map(s => `H${s.H}: ${nf(s.yh + s.d / 2)} / ${nf(s.archH)} mm`).join('; ')}). Confirm dropping the "arch crown level with round hole top" rule.`)]);
     return out;
   };
   const store = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
@@ -987,9 +1022,9 @@ const DATA = /*@DATA@*/{};
       ? T(`Còn ${open} mục chưa xác nhận. Đánh dấu từng mục sau khi xem bản vẽ, rồi gửi kết quả.`, `${open} item${open > 1 ? 's' : ''} still to confirm. Tick each item after checking the drawing, then send the result.`)
       : T('Đã xác nhận đủ các mục. Gửi kết quả cho bên thiết kế.', 'All items confirmed. Send the result to the designer.');
     $('nav-open').textContent = open || '';
-    const body = [T(`Kết quả duyệt thiết kế thanh kê PVC chữ U H20–H70 (bản ${DATA.date})`, `Design review result, PVC U-channel rebar spacer H20–H70 (issue ${DATA.date})`), '',
+    const body = [T(`Kết quả duyệt thiết kế thanh kê cốt thép PVC chữ U H20–H70 (bản ${DATA.date})`, `Design review result, PVC U-channel rebar spacer H20–H70 (issue ${DATA.date})`), '',
       ...IT.map(([id, t]) => `[${checked[id] ? 'x' : ' '}] ${t}`), '', T('Ghi chú:', 'Notes:'), note.value || T('(không)', '(none)')].join('\n');
-    $('btn-mail').href = 'mailto:?subject=' + encodeURIComponent(T('Xác nhận thiết kế thanh kê PVC chữ U H20–H70', 'Design confirmation, PVC U-channel rebar spacer H20–H70')) + '&body=' + encodeURIComponent(body);
+    $('btn-mail').href = 'mailto:?subject=' + encodeURIComponent(T('Xác nhận thiết kế thanh kê cốt thép PVC chữ U H20–H70', 'Design confirmation, PVC U-channel rebar spacer H20–H70')) + '&body=' + encodeURIComponent(body);
   }
 
   // ---------- điều hướng (mỗi mục là một màn hình riêng, theo #hash)
@@ -1001,7 +1036,7 @@ const DATA = /*@DATA@*/{};
   menuBtn.addEventListener('click', () => { side.classList.add('open'); menuBtn.setAttribute('aria-expanded', 'true'); side.querySelector('a')?.focus(); });
   $('btn-close').addEventListener('click', () => { closeMenu(); menuBtn.focus(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && side.classList.contains('open')) { closeMenu(); menuBtn.focus(); } });
-  const routeLabels = id => { $('crumb').textContent = routeName(id); document.title = `${routeName(id)} · ${T('Thanh kê PVC chữ U', 'PVC U-channel spacer')}`; };
+  const routeLabels = id => { $('crumb').textContent = routeName(id); document.title = `${routeName(id)} · ${T('Thanh kê cốt thép PVC chữ U', 'PVC U-channel spacer')}`; };
   function route() {
     const id = curRoute();
     Object.keys(ROUTES).forEach(k => { $('view-' + k).hidden = k !== id; });

@@ -201,7 +201,7 @@ function export3D() {
 // =====================================================================================
 // 3. XUẤT DXF BẢN VẼ 2D — chuyển tờ bản vẽ SVG sang DXF đúng tỷ lệ 1:1 (mm)
 // =====================================================================================
-const STROKE = { 'ln': 'CONTOUR', 'ln-s': 'CONTOUR', 'brk': 'CONTOUR', 'hid': 'HIDDEN', 'ctr': 'CENTER', 'dim': 'DIM', 'ext': 'DIM', 'callout': 'DETAIL', 'dbox': 'DETAIL' };
+const STROKE = { 'ln': 'CONTOUR', 'ln-s': 'CONTOUR', 'brk': 'CONTOUR', 'hid': 'HIDDEN', 'ctr': 'CENTER', 'dim': 'DIM', 'ext': 'DIM', 'callout': 'DETAIL', 'dbox': 'DETAIL', 'cutln': 'CUT', 'cutthin': 'CENTER' };
 const FONT = { ttl: 13, sb: 12, tag: 12, dt: 12.5 };
 
 function export2D() {
@@ -258,9 +258,12 @@ function export2D() {
     if (tag === 'line') {
       if (!L) continue;
       const pts = [T(+el.getAttribute('x1'), +el.getAttribute('y1')), T(+el.getAttribute('x2'), +el.getAttribute('y2'))];
-      emit(L, pts, false, clip); markers(el, pts);
+      if (L === 'CUT') dxf.poly('CUT', pts, false, 2.6 / k);          // vết cắt: nét dày
+      else emit(L, pts, false, clip);
+      markers(el, pts);
     } else if (tag === 'path') {
       const { pts, closed } = parsePath(el.getAttribute('d') || '');
+      if ((el.getAttribute('class') || '').includes('cutfill') && pts.length === 3) { dxf.solid('CUT', pts[0], pts[1], pts[2]); continue; }   // mũi tên chiều nhìn
       if (hatchFill && closed) { hatch(pts, clip); continue; }
       if (!L) continue;
       emit(L, pts, closed, clip); markers(el, pts);
@@ -288,10 +291,12 @@ function export2D() {
   const x0 = dxf.min[0], x1 = dxf.max[0], y0 = dxf.min[1], y1 = dxf.max[1], W = x1 - x0;
   const th = Math.max(1.8, W * 0.0105), rh = th * 2.3, m = th * 2;
   const rows = [
-    [[LT('Sản phẩm', 'Product'), LT('Thanh kê PVC chữ U', 'PVC U-channel rebar spacer')], [LT('Mã / cỡ', 'Code / size'), `${s.code} · ${nf(s.W)} × ${nf(s.H)} mm`]],
-    [[LT('Vật liệu', 'Material'), LT('uPVC tái chế', 'Recycled uPVC')], [LT('Công nghệ', 'Process'), LT('Đùn ép profile, dập lỗ liên tục', 'Profile extrusion, continuous punching')]],
-    [[LT('Chiều dài thanh', 'Bar length'), LT(`${nf(st.L, 0)} mm, lỗ ở đầu thanh ngẫu nhiên`, `${nf(st.L, 0)} mm, random hole position at bar ends`)], [LT('Đơn vị', 'Units'), LT('mm · dung sai chờ thống nhất', 'mm · tolerances to be agreed')]],
-    [[LT('Tỷ lệ', 'Scale'), LT(`Hình chiếu chính 1:1 · hình trích I, II phóng to ×${nf(+svg.dataset.kd / k)}`, `Main views 1:1 · details I, II enlarged ×${nf(+svg.dataset.kd / k)}`)], [LT('Trạng thái', 'Status'), LT(`Bản duyệt thiết kế · ${st.date}`, `Design review issue · ${st.date}`)]],
+    [[LT('Sản phẩm', 'Product'), LT('Thanh kê cốt thép PVC chữ U', 'PVC U-channel rebar spacer')], [LT('Mã / kích thước', 'Code / size'), `${s.code} · ${nf(s.W)} × ${nf(s.H)} mm`]],
+    [[LT('Số hiệu bản vẽ', 'Drawing no.'), `${s.code}-BV01 · ${LT('lần sửa đổi', 'rev.')} A · ${LT('tờ', 'sheet')} 1/1`], [LT('Giai đoạn / ngày', 'Stage / date'), LT(`Duyệt thiết kế · ${st.date}`, `Design review · ${st.date}`)]],
+    [[LT('Vật liệu', 'Material'), LT('uPVC tái chế', 'Recycled uPVC')], [LT('Công nghệ', 'Process'), LT('Đùn ép biên dạng, dập lỗ liên tục', 'Profile extrusion, continuous punching')]],
+    [[LT('Chiều dài thanh', 'Bar length'), LT(`${nf(st.L, 0)} mm, lỗ ở đầu thanh ngẫu nhiên`, `${nf(st.L, 0)} mm, random hole position at bar ends`)], [LT('Đơn vị', 'Units'), 'mm']],
+    [[LT('Tỷ lệ', 'Scale'), LT(`Hình chính 1:1 · chi tiết 1, 2 tỷ lệ ${svg.dataset.ratio}:1`, `Main views 1:1 · details 1, 2 at ${svg.dataset.ratio}:1`)], [LT('Phương pháp chiếu', 'Projection'), LT('Góc thứ nhất', 'First angle')]],
+    [[LT('Dung sai', 'Tolerances'), LT('Lớp bảo vệ c = H ±1 mm (đề xuất); kích thước khác chờ thống nhất', 'Cover c = H ±1 mm (proposed); other dimensions to be agreed')], [LT('Lập / Kiểm / Duyệt', 'Drawn / Checked / Approved'), '........ / ........ / ........']],
   ];
   const tbTop = y0 - m, tbBot = tbTop - rows.length * rh, mid = x0 + W / 2;
   rows.forEach((r, i) => {
