@@ -50,6 +50,7 @@ function init3D() {
   renderer.domElement.tabIndex = 0;
   renderer.domElement.addEventListener('keydown', onViewerKey);
   host.appendChild(renderer.domElement);
+  dimSvg = svgEl('svg', { 'aria-hidden': 'true', style: 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible' }, host);
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(30, 1, 0.5, 30000);
   scene.add(new THREE.HemisphereLight(0xffffff, 0x80858f, 1.15));
@@ -84,7 +85,79 @@ function resize() {
   camera.aspect = w / h; camera.updateProjectionMatrix();
   setView(curView, false);
 }
-function render() { if (renderer) renderer.render(scene, camera); }
+function render() { if (renderer) { renderer.render(scene, camera); updateDims(); } }
+
+// =====================================================================================
+// 1b. KÍCH THƯỚC TRÊN MÔ HÌNH 3D — lớp SVG chiếu từ toạ độ thế giới, cập nhật mỗi lần vẽ lại
+// =====================================================================================
+let dimSvg = null, dimDefs = [], dimsOn = true;
+try { dimsOn = localStorage.getItem('kh-dims') !== '0'; } catch (e) {}
+const SVGNS = 'http://www.w3.org/2000/svg';
+const svgEl = (tag, attrs, parent) => { const e = document.createElementNS(SVGNS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+
+/** Các kích thước chính, chọn trên cánh A (mặt hướng ra trước) và đầu phải thanh. */
+function buildDims(s, L, e) {
+  const half = L / 2, W = s.W, H = s.H, P = s.P, V = (x, y, z) => new THREE.Vector3(x, y, z), g = Math.max(10, 0.32 * H);
+  const k = Math.max(0, Math.ceil((s.archW / 2 + 5 - e) / P)), xa = -half + e + k * P;       // khuyết vòm đầu tiên nằm trọn trong đoạn thanh
+  const defs = [];
+  const add = (a, b, off, label, o = {}) => defs.push({ a, b, off, label, ...o });
+  add(V(-half, 0, W / 2), V(half, 0, W / 2), V(0, 0, 0.5 * W + 1.7 * g), nf(L, 0) + ' mm', { main: true });                      // chiều dài
+  add(V(half, 0, W / 2), V(half, H, W / 2), V(g * 1.6, 0, 0), 'c = ' + nf(H, 0));                                                // chiều cao = lớp bảo vệ
+  add(V(half, H, -W / 2), V(half, H, W / 2), V(g * 1.6, 0, 0), 'W = ' + nf(W, 0));                                               // bề rộng
+  if (xa + P + s.archW / 2 < half - 1) {
+    add(V(xa, 0, W / 2), V(xa + P, 0, W / 2), V(0, 0, 0.5 * W + 1.25 * g), 'P = ' + nf(P, 0), { main: true });                       // bước lỗ (đo sát nền, giữa hai đường tâm khuyết vòm)
+  }
+  // lỗ bụng (trên mặt lưng, đồng tâm khuyết vòm cánh A): chiều dài đo dọc trục lỗ, bề rộng đo ngang tại tâm đầu lỗ — đúng vị trí lỗ
+  const Ls = s.slotLen || 0, wsl = s.slotWid || 0, sp = s.slotPitch || P;
+  if (Ls > 0 && wsl > 0) {
+    const ks0 = Math.max(0, Math.ceil((Ls / 2 + 3 - e) / sp)), gap = wsl / 2 + 8;
+    const ks = [ks0, ks0 + 1].find(q => -half + e + q * sp + Ls / 2 + gap + 6 < half);       // lỗ nằm trọn trong đoạn thanh, đủ chỗ cho đường đo bề rộng
+    if (ks !== undefined) {
+      const xs = -half + e + ks * sp;
+      add(V(xs - Ls / 2, H, 0), V(xs + Ls / 2, H, 0), V(0, 0, 0), nf(Ls, 0));                                                  // dài lỗ, đo dọc trục lỗ
+      add(V(xs + Ls / 2 - wsl / 2, H, -wsl / 2), V(xs + Ls / 2 - wsl / 2, H, wsl / 2), V(gap, 0, 0), nf(wsl, 0));              // rộng lỗ, đường đo đặt ngoài đầu lỗ
+    }
+  }
+  if (xa + P + s.archW / 2 < half - 1) {
+    add(V(xa - s.archW / 2, 0, W / 2), V(xa + s.archW / 2, 0, W / 2), V(0, 0, 0.5 * W + 0.7 * g), nf(s.archW, 0));              // rộng khuyết vòm
+    add(V(xa - s.archW / 2, 0, W / 2), V(xa - s.archW / 2, s.archH, W / 2), V(0, 0, 0.7 * g), nf(s.archH, 1));                   // cao khuyết vòm (mép trái khuyết)
+  }
+  const xh = xa + P / 2;
+  if (s.archDia > 0 && xh + s.archDia / 2 < half && xh - s.archDia / 2 > -half) {
+    add(V(xh - s.archDia / 2, s.archHoleY, W / 2), V(xh + s.archDia / 2, s.archHoleY, W / 2), V(0, 0, 0.7 * g), 'Ø' + nf(s.archDia, 0));  // lỗ tròn
+  }
+  dimDefs = defs;
+}
+
+function updateDims() {
+  if (!dimSvg) return;
+  dimSvg.replaceChildren();
+  if (!dimsOn || !dimDefs.length || !camera) return;
+  const w = host.clientWidth, h = host.clientHeight; if (!w || !h) return;
+  dimSvg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  const dark = scene.background.getHSL({}).l < 0.4;
+  const col = dark ? '#8ab4ff' : '#1d4ed8', pill = dark ? 'rgba(24,26,31,0.9)' : 'rgba(255,255,255,0.92)';
+  const pr = v => { const p = v.clone().project(camera); return { x: (p.x * 0.5 + 0.5) * w, y: (-p.y * 0.5 + 0.5) * h, z: p.z }; };
+  const placed = [];                                          // nhãn đã đặt; nhãn sau đè lên nhãn trước thì bỏ (hiện lại khi phóng to)
+  for (const d of dimDefs) {
+    const a = pr(d.a), b = pr(d.b), a2 = pr(d.a.clone().add(d.off)), b2 = pr(d.b.clone().add(d.off));
+    if ([a, b, a2, b2].some(p => p.z > 1 || p.z < -1)) continue;
+    const mx = (a2.x + b2.x) / 2, my = (a2.y + b2.y) / 2, tw = d.label.length * 6.6 + 12, box = [mx - tw / 2 - 3, my - 12, mx + tw / 2 + 3, my + 12];
+    if (placed.some(r => box[0] < r[2] && box[2] > r[0] && box[1] < r[3] && box[3] > r[1])) continue;
+    placed.push(box);
+    svgEl('line', { x1: a.x, y1: a.y, x2: a2.x, y2: a2.y, stroke: col, 'stroke-width': 1, opacity: 0.55 }, dimSvg);
+    svgEl('line', { x1: b.x, y1: b.y, x2: b2.x, y2: b2.y, stroke: col, 'stroke-width': 1, opacity: 0.55 }, dimSvg);
+    const dx = b2.x - a2.x, dy = b2.y - a2.y, len = Math.hypot(dx, dy) || 1, ux = dx / len, uy = dy / len, al = Math.min(9, len / 4);
+    svgEl('line', { x1: a2.x, y1: a2.y, x2: b2.x, y2: b2.y, stroke: col, 'stroke-width': 1.4 }, dimSvg);
+    for (const [p, sg] of [[a2, 1], [b2, -1]]) {
+      const bx = p.x + sg * ux * al, by = p.y + sg * uy * al, nx = -uy * al * 0.32, ny = ux * al * 0.32;
+      svgEl('path', { d: `M${p.x},${p.y} L${bx + nx},${by + ny} L${bx - nx},${by - ny} Z`, fill: col }, dimSvg);
+    }
+    svgEl('rect', { x: mx - tw / 2, y: my - 9.5, width: tw, height: 19, rx: 4, fill: pill, stroke: col, 'stroke-width': 0.8 }, dimSvg);
+    const t = svgEl('text', { x: mx, y: my + 4, 'text-anchor': 'middle', fill: col, 'font-size': 12, 'font-weight': 600, 'font-family': 'IBM Plex Sans, system-ui, sans-serif' }, dimSvg);
+    t.textContent = d.label;
+  }
+}
 
 // Không vẽ nét viền đen: mô hình hiển thị mịn, chỉ phân biệt mặt bằng ánh sáng (đặt true để bật lại nét CAD)
 const SHOW_EDGES = false;
@@ -117,6 +190,7 @@ function build() {
   if (key === curKey && curParts.length) return;
   curKey = key;
   curParts = buildSpacerGeometries(s, L, st.e, { curveSegs: L > 1000 ? 12 : 20 });
+  buildDims(s, L, st.e);
   if (ok3d) {
     group.children.slice().forEach(o => { group.remove(o); o.geometry?.dispose(); });
     for (const p of curParts) {
@@ -152,7 +226,7 @@ function setView(view, reset = true) {
     dist = (half * 1.08) / Math.tan(Math.atan(Math.tan(fov / 2) * aspect));
   } else {
     target = new THREE.Vector3(0, s.H / 2, 0); dir = new THREE.Vector3(0.6, 0.55, 1);
-    dist = fitDist(Math.hypot(half, s.W / 2, s.H / 2) * (L > 1000 ? 0.6 : 0.78));
+    dist = fitDist(Math.hypot(half, s.W / 2, s.H / 2) * (L > 1000 ? 0.6 : 0.62) + (dimsOn ? 2.6 * Math.max(10, 0.32 * s.H) : 0));   // chừa chỗ cho các đường kích thước
   }
   if (reset) {
     camera.position.copy(target).add(dir.normalize().multiplyScalar(dist));
@@ -360,6 +434,8 @@ document.querySelectorAll('[data-len]').forEach(b => b.addEventListener('click',
   build();
 }));
 document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view, true)));
+const dimBtn = $('btn-dims');
+if (dimBtn) { dimBtn.setAttribute('aria-pressed', dimsOn); dimBtn.addEventListener('click', () => { dimsOn = !dimsOn; dimBtn.setAttribute('aria-pressed', dimsOn); try { localStorage.setItem('kh-dims', dimsOn ? '1' : '0'); } catch (e) {} render(); }); }
 $('btn-dxf3d').addEventListener('click', export3D);
 $('btn-dxf2d').addEventListener('click', export2D);
 build();
