@@ -22,6 +22,20 @@ const host = $('v3d');
 let renderer, scene, camera, controls, group, grid, mat, edgeMat, ok3d = false;
 let curLen = 2000, curView = 'iso', curParts = [], curKey = '';
 
+const viewerLabel = () => LT('Mô hình 3D thanh kê. Kéo để xoay, cuộn để phóng to; bằng bàn phím: phím mũi tên xoay, + và − phóng, Home về góc nhìn ban đầu', '3D model of the spacer. Drag to rotate, scroll to zoom; with the keyboard: arrow keys rotate, + and − zoom, Home resets the view');
+/** Điều khiển bằng bàn phím: mũi tên xoay quanh thanh, + / − phóng, Home (hoặc 0) về góc nhìn ban đầu. */
+function onViewerKey(e) {
+  const k = e.key;
+  if (k === 'Home' || k === '0') { e.preventDefault(); setView(curView, true); return; }
+  const sph = new THREE.Spherical().setFromVector3(camera.position.clone().sub(controls.target));
+  if (k === 'ArrowLeft') sph.theta -= 0.12; else if (k === 'ArrowRight') sph.theta += 0.12;
+  else if (k === 'ArrowUp') sph.phi = Math.max(0.08, sph.phi - 0.1); else if (k === 'ArrowDown') sph.phi = Math.min(Math.PI - 0.08, sph.phi + 0.1);
+  else if (k === '+' || k === '=') sph.radius *= 0.9; else if (k === '-' || k === '_') sph.radius *= 1.1;
+  else return;
+  e.preventDefault();
+  camera.position.copy(controls.target).add(new THREE.Vector3().setFromSpherical(sph)); camera.lookAt(controls.target); controls.update(); render();
+}
+
 function init3D() {
   try {
     renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
@@ -30,8 +44,10 @@ function init3D() {
     return false;
   }
   renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
-  renderer.domElement.setAttribute('aria-label', LT('Mô hình 3D thanh kê: kéo để xoay, cuộn để phóng to', '3D model of the spacer: drag to rotate, scroll to zoom'));
-  renderer.domElement.setAttribute('role', 'img');
+  renderer.domElement.setAttribute('aria-label', viewerLabel());
+  renderer.domElement.setAttribute('role', 'group');
+  renderer.domElement.tabIndex = 0;
+  renderer.domElement.addEventListener('keydown', onViewerKey);
   host.appendChild(renderer.domElement);
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(30, 1, 0.5, 30000);
@@ -93,7 +109,7 @@ function build() {
   const key = [st.s.H, st.e, L].join('|');
   const lenTxt = L >= 2000 ? LT(`thanh ${nf(L, 0)} mm`, `${nf(L, 0)} mm bar`) : LT(`đoạn ${L} mm tính từ đầu trái`, `${L} mm from the left end`);
   $('m3d-head').textContent = LT(`H${st.s.H} · thanh ${st.bar} · e = ${nf(st.e)} mm · ${lenTxt}`, `H${st.s.H} · bar ${st.bar} · e = ${nf(st.e)} mm · ${lenTxt}`);
-  if (renderer) renderer.domElement.setAttribute('aria-label', LT('Mô hình 3D thanh kê: kéo để xoay, cuộn để phóng to', '3D model of the spacer: drag to rotate, scroll to zoom'));
+  if (renderer) renderer.domElement.setAttribute('aria-label', viewerLabel());
   if (key === curKey && curParts.length) return;
   curKey = key;
   curParts = buildSpacerGeometries(s, L, st.e, { curveSegs: L > 1000 ? 8 : 14 });

@@ -29,6 +29,8 @@ python build_dashboard.py
 - **So sánh cỡ**: biểu đồ cầu nhựa mỏng nhất / chiều dày thành (đường 1,00), bảng kích thước có lọc "Cần lưu ý", bấm dòng để mở bản vẽ cỡ đó.
 - **Duyệt thiết kế**: danh sách mục cần khách xác nhận (đánh dấu và ghi chú lưu trên máy người xem), nút gửi kết quả qua email (mở trình gửi thư với nội dung điền sẵn).
 
+**Liên kết, bàn phím, in (từ 23/11/2026):** địa chỉ giữ màn hình, cỡ và ngôn ngữ, ví dụ `dashboard_mau_kh.html#ban-ve?co=H40&lang=en`; nút "Sao chép liên kết" trên thanh trên cùng gửi đúng bản vẽ cho khách. Có liên kết "Bỏ qua tới nội dung chính", mô hình 3D điều khiển bằng bàn phím (mũi tên xoay, `+`/`-` phóng, `Home` về ban đầu), vùng bấm ≥ 44 px trên màn hình cảm ứng. Nút In / lưu PDF chỉ in màn hình đang xem (A4, nền trắng); màn hình Bản vẽ ra 2 trang.
+
 **Song ngữ Việt / Anh (từ 23/11/2026):** nút **VI | EN** trên thanh trên cùng đổi toàn bộ dashboard: giao diện, tờ bản vẽ, khung tên, biểu đồ, danh sách duyệt, email và file DXF xuất ra (tên file `ThanhKe_…` / `Spacer_…`). Ngôn ngữ được nhớ trên máy người xem. Chữ tĩnh trong `dashboard.src.html` có thuộc tính `data-en` (nội dung) hoặc `data-en-title` / `data-en-aria` / `data-en-ph`; chữ sinh bằng mã dùng `T(vi, en)` (trong `web/dash3d.src.js` là `LT(vi, en)`). Thuật ngữ: bụng = web, cánh = flange, lỗ vòm = arch opening, lỗ bụng = web slot, khoảng cách mép lỗ = edge distance, lớp bê tông bảo vệ = concrete cover, ván khuôn = formwork, hình chiếu bằng / đứng = top view / front elevation, hình trích = detail.
 
 Nội dung:

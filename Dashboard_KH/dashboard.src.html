@@ -163,6 +163,24 @@ svg.dwg .cutln { fill: none; stroke: var(--line); stroke-width: 2.6; stroke-line
 svg.dwg .cutthin { fill: none; stroke: var(--line); stroke-width: .8; stroke-dasharray: 14 4 3 4; }
 svg.dwg .cutfill { fill: var(--line); stroke: none; }
 
+/* trợ năng: skip link, ẩn với mắt nhưng đọc được, vùng bấm */
+.visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.skip { position: absolute; left: 8px; top: -60px; z-index: 100; background: var(--primary); color: var(--on-primary); padding: 10px 16px; border-radius: 8px; font-weight: 500; text-decoration: none; }
+.skip:focus { top: 8px; }
+.sheet:focus { outline: none; }
+.viewer canvas:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
+a.rowlink { color: inherit; text-decoration: none; display: inline-block; padding: 12px 0; }
+a.rowlink:hover { text-decoration: underline; }
+.sizes button, .seg button { min-height: 32px; }
+@media (pointer: coarse), (max-width: 900px) {
+  .btn, .seg button, .sizes button, .nav a, .side-foot button { min-height: 44px; }
+  .sizes button, .lang button { min-width: 48px; }
+  .top .menu-btn { width: 44px; height: 44px; }
+  .checks li input { width: 24px; height: 24px; margin-top: 0; }
+  .rng input { min-height: 44px; }
+  a.rowlink { padding: 14px 8px 14px 0; min-width: 44px; }
+  .panel-head a.meta { display: inline-flex; align-items: center; min-height: 44px; }
+}
 /* dấu đỏ HAN CORPORATION */
 :root { --seal: #c8102e; }
 :root[data-theme="dark"] { --seal: #ff6b6b; }
@@ -274,6 +292,12 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
   .btn { height: 40px; }
   .seg button { height: 36px; }
 }
+@media (max-width: 900px) {
+  .tbl-wrap table th:first-child, .tbl-wrap table td:first-child { position: sticky; left: 0; z-index: 1; background: var(--surface); border-right: 1px solid var(--rule); }
+  .tbl-wrap thead th:first-child { z-index: 2; }
+  tbody tr:hover > :first-child { background: var(--raised); }
+  tbody tr.on > :first-child { background: var(--active); }
+}
 @media (max-width: 480px) {
   .kpi { padding: 12px 14px; }
   .kpi .v { font-size: 22px; line-height: 30px; }
@@ -291,14 +315,30 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
   .app { display: block; }
   .side, .top, .actions, .controls, .swipe, .hint { display: none !important; }
   .sheet { border: 0; margin: 0; padding: 0; }
-  .view[hidden] { display: block !important; break-before: page; }
   svg.dwg { min-width: 0; }
+  svg#d-sheet { max-height: 150mm; }
   .panel { break-inside: avoid; }
+  .title-row { margin-bottom: 4mm; }
+  .title-row h1 { font-size: 18px; }
+  .kpis { grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)) !important; margin-bottom: 5mm; }
+  .kpi, .kpi:nth-child(n) { padding: 6px 8px; border-top: 0 !important; }
+  .kpi:nth-child(odd) { border-left: 1px solid var(--border); }
+  .kpi:first-child { border-left: 0; }
+  .kpi .v { font-size: 17px; line-height: 22px; margin-top: 2px; }
+  .kpi .k, .kpi .s { font-size: 10px; line-height: 13px; }
+  .panel-head { padding: 6px 12px; }
+  .kpis .kpi:last-child { grid-column: auto !important; }
+  .tblock { font-size: 10.5px; line-height: 14px; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+  .tblock > div { border-right: 1px solid var(--rule) !important; }
+  .tblock > div { padding: 3px 8px; }
+  .tblock .k { font-size: 9px; }
+  .dwg-scroll { padding: 0 !important; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 </head>
 <body>
+<a class="skip" href="#main" data-en="Skip to main content">Bỏ qua tới nội dung chính</a>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <symbol id="seal" viewBox="0 0 170 64">
     <rect x="2" y="2" width="166" height="60" rx="9" fill="none" stroke="currentColor" stroke-width="3"/>
@@ -338,16 +378,19 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
     <div class="sizes" role="radiogroup" aria-label="Lọc theo cỡ" data-en-aria="Filter by size" id="tabs"></div>
   </header>
 
-  <main class="sheet" id="main">
+  <main class="sheet" id="main" tabindex="-1">
 
     <!-- ===== Bản vẽ ===== -->
     <section class="view" id="view-ban-ve" aria-labelledby="h-ban-ve">
       <div class="title-row">
         <div>
           <h1 id="h-ban-ve"><span class="code" id="t-code">--</span> · <span id="t-size">--</span></h1>
-          <p id="t-finding">--</p>
+          <p id="t-finding" aria-live="polite">--</p>
         </div>
         <div class="actions">
+          <button class="btn" type="button" id="btn-link" title="Sao chép liên kết tới đúng bản vẽ này" data-en-title="Copy a link to exactly this drawing">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></svg><span data-en="Copy link">Sao chép liên kết</span></button>
+          <span class="visually-hidden" id="link-status" role="status" aria-live="polite"></span>
           <button class="btn" type="button" onclick="window.print()"><span data-en="Print / PDF">In / PDF</span></button>
           <button class="btn primary" type="button" id="btn-dxf2d" title="Bản vẽ cỡ đang chọn, tỷ lệ 1:1, đơn vị mm, mở bằng AutoCAD" data-en-title="Drawing of the selected size, scale 1:1, units mm, opens in AutoCAD">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg><span data-en="Export drawing DXF">Xuất DXF bản vẽ</span></button>
@@ -374,7 +417,7 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
       <div class="title-row">
         <div>
           <h1 id="h-3d"><span data-en="3D model">Mô hình 3D</span> · <span class="code" id="t3-code">--</span></h1>
-          <p id="m3d-head">--</p>
+          <p id="m3d-head" aria-live="polite">--</p>
         </div>
         <div class="actions">
           <button class="btn primary" type="button" id="btn-dxf3d" title="Mô hình lưới 3D của thanh đang xem, đơn vị mm, mở bằng AutoCAD" data-en-title="3D mesh of the bar shown, units mm, opens in AutoCAD">
@@ -399,7 +442,7 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
           <a class="meta" href="#thanh-cat" data-en="Change bar / cut position">Đổi thanh / vị trí cắt</a>
         </div>
         <div class="viewer" id="v3d"></div>
-        <p class="hint" data-en="Drag to rotate · scroll to zoom · right-drag to pan. Flange A faces the front. The DXF opens in AutoCAD; save as .dwg if needed.">Kéo để xoay · cuộn để phóng to · kéo chuột phải để dời. Cánh A ở phía trước. File DXF mở bằng AutoCAD, lưu thành .dwg nếu cần.</p>
+        <p class="hint" data-en="Drag to rotate · scroll to zoom · right-drag to pan. Keyboard: click the 3D frame, then use the arrow keys to rotate, + and − to zoom, Home to reset the view. Flange A faces the front. The DXF opens in AutoCAD; save as .dwg if needed.">Kéo để xoay · cuộn để phóng to · kéo chuột phải để dời. Bàn phím: bấm vào khung 3D rồi dùng phím mũi tên để xoay, + và − để phóng, Home để về góc nhìn ban đầu. Cánh A ở phía trước. File DXF mở bằng AutoCAD, lưu thành .dwg nếu cần.</p>
       </div>
     </section>
 
@@ -428,7 +471,7 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
       </div>
       <div class="panel">
         <div class="panel-head"><h2 data-en="Bar ends with a strip narrower than the flange thickness">Tỷ lệ đầu thanh có mép nhựa hẹp hơn chiều dày cánh</h2><span class="meta" data-en="By size, over all cut positions">Theo cỡ, xét mọi vị trí cắt</span></div>
-        <div class="panel-body"><div class="chart" id="ch-thin"></div><p class="note" id="ch-thin-note">--</p></div>
+        <div class="panel-body"><div class="chart" id="ch-thin"></div><p class="note" id="ch-thin-note" aria-live="polite">--</p></div>
       </div>
     </section>
 
@@ -437,7 +480,7 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
       <div class="title-row">
         <div>
           <h1 id="h-cmp" data-en="Size comparison">So sánh các cỡ</h1>
-          <p id="cmp-finding">--</p>
+          <p id="cmp-finding" aria-live="polite">--</p>
         </div>
         <div class="seg" role="group" aria-label="Lọc bảng" data-en-aria="Filter table">
           <button type="button" data-filter="all" aria-pressed="true" data-en="All sizes">Tất cả cỡ</button>
@@ -453,8 +496,8 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
         <div class="tbl-wrap">
           <table>
             <thead><tr>
-              <th data-en="Size">Cỡ</th><th>W × H</th><th data-en="Flange / web t">Dày cánh / bụng</th><th data-en="Inner chamfer">Vát góc trong</th><th data-en="Arch notch">Khuyết vòm</th><th data-en="Round hole · centre ht">Lỗ tròn · tâm cao</th>
-              <th data-en="P / stagger">P / so le</th><th class="l" data-en="Web slot">Lỗ bụng</th><th data-en="Arch crown → web">Đỉnh khuyết vòm → bụng</th><th data-en="Arch ↔ round hole">Khuyết vòm ↔ lỗ tròn</th><th data-en="Flange open area">Tỷ lệ lỗ trên cánh</th>
+              <th scope="col" data-en="Size">Cỡ</th><th scope="col">W × H</th><th scope="col" data-en="Flange / web t">Dày cánh / bụng</th><th scope="col" data-en="Inner chamfer">Vát góc trong</th><th scope="col" data-en="Arch notch">Khuyết vòm</th><th scope="col" data-en="Round hole · centre ht">Lỗ tròn · tâm cao</th>
+              <th scope="col" data-en="P / stagger">P / so le</th><th scope="col" class="l" data-en="Web slot">Lỗ bụng</th><th scope="col" data-en="Arch crown → web">Đỉnh khuyết vòm → bụng</th><th scope="col" data-en="Arch ↔ round hole">Khuyết vòm ↔ lỗ tròn</th><th scope="col" data-en="Flange open area">Tỷ lệ lỗ trên cánh</th>
             </tr></thead>
             <tbody id="sum-body"></tbody>
           </table>
@@ -468,7 +511,7 @@ textarea { width: 100%; min-height: 120px; padding: 10px 12px; border: 1px solid
       <div class="title-row">
         <div>
           <h1 id="h-rev" data-en="Design review">Duyệt thiết kế</h1>
-          <p id="rev-sub">--</p>
+          <p id="rev-sub" aria-live="polite">--</p>
         </div>
         <div class="actions">
           <button class="btn" type="button" id="btn-reset" data-en="Clear ticks">Bỏ đánh dấu</button>
@@ -514,7 +557,7 @@ const DATA = /*@DATA@*/{};
   const NS = 'http://www.w3.org/2000/svg';
   const $ = id => document.getElementById(id);
   // ngôn ngữ hiển thị: 'vi' | 'en' (ghi nhớ trên máy người xem)
-  let LANG = (() => { try { return JSON.parse(localStorage.getItem('kh-lang')) === 'en' ? 'en' : 'vi'; } catch (e) { return 'vi'; } })();
+  let LANG = (() => { const q = new URLSearchParams(location.hash.split('?')[1] || '').get('lang'); if (q === 'en' || q === 'vi') return q; try { return JSON.parse(localStorage.getItem('kh-lang')) === 'en' ? 'en' : 'vi'; } catch (e) { return 'vi'; } })();
   const T = (vi, en) => (LANG === 'en' ? en : vi);
   const LOC = () => (LANG === 'en' ? 'en-US' : 'vi-VN');
   const nf = (x, d = 1) => Number(x).toLocaleString(LOC(), { maximumFractionDigits: d });
@@ -955,6 +998,7 @@ const DATA = /*@DATA@*/{};
     [...tabs.children].forEach((t, j) => { t.setAttribute('aria-checked', j === cur); t.tabIndex = j === cur ? 0 : -1; });
     renderTable();
     try { localStorage.setItem('kh-size', String(s.H)); } catch (e) {}
+    syncHash();
   }
 
   // ---------- bảng so sánh (lọc: tất cả / cần lưu ý)
@@ -964,8 +1008,8 @@ const DATA = /*@DATA@*/{};
     const sb = $('sum-body'); sb.innerHTML = '';
     const rows = S.map((s, i) => [s, i]).filter(([s]) => filter === 'all' || flagged(s));
     rows.forEach(([s, i]) => {
-      const tr = document.createElement('tr'); tr.tabIndex = 0; tr.title = T(`Mở bản vẽ H${s.H}`, `Open drawing H${s.H}`);
-      if (i === cur) tr.className = 'on';
+      const tr = document.createElement('tr'); const href = '#ban-ve?co=H' + s.H + (LANG === 'en' ? '&lang=en' : '');
+      if (i === cur) { tr.className = 'on'; tr.setAttribute('aria-current', 'true'); }
       const cells = [[`H${s.H}`, 'l'], [`${nf(s.W)} × ${nf(s.H)}`], [`${nf(s.tw)} / ${nf(s.ttop)}`], [`${nf(s.chamfer)} × 45°`],
         [`${nf(s.archW)} × ${nf(s.archH)}, R${nf(archRof(s))}`], [`Ø${nf(s.d)} · ${nf(s.yh)}`], [`${nf(s.P)} / ${nf(s.P / 2)}`],
         [`${nf(s.slotL)} × ${nf(s.slotW)} ${s.slotType === 'oval' ? 'oval' : 'R' + nf(rrOf(s))}`, 'l'],
@@ -973,12 +1017,12 @@ const DATA = /*@DATA@*/{};
       cells.forEach(([v, cls, w], j) => {
         const td = document.createElement(j ? 'td' : 'th'); if (!j) td.scope = 'row';
         if (cls) td.className = cls;
-        td.textContent = v;
+        if (!j) { const a = document.createElement('a'); a.className = 'rowlink'; a.href = href; a.textContent = v; a.title = T(`Mở bản vẽ H${s.H}`, `Open drawing H${s.H}`); td.appendChild(a); }
+        else td.textContent = v;
         if (w) { const p = document.createElement('span'); p.className = 'pill warn'; p.textContent = T('hẹp', 'narrow'); td.appendChild(p); }
         tr.appendChild(td);
       });
-      tr.addEventListener('click', () => { select(i); location.hash = '#ban-ve'; });
-      tr.addEventListener('keydown', e => { if (e.key === 'Enter') tr.click(); });
+      tr.addEventListener('click', e => { if (!e.target.closest('a')) location.hash = href; });   // bấm cả dòng cũng mở; liên kết ở ô đầu là đích cho bàn phím
       sb.appendChild(tr);
     });
     $('tbl-empty').hidden = rows.length > 0;
@@ -1052,7 +1096,11 @@ const DATA = /*@DATA@*/{};
   // ---------- điều hướng (mỗi mục là một màn hình riêng, theo #hash)
   const ROUTES = { 'ban-ve': ['Bản vẽ', 'Drawing'], 'mo-hinh-3d': ['Mô hình 3D', '3D model'], 'thanh-cat': ['Thanh cắt', 'Cut bars'], 'so-sanh': ['So sánh cỡ', 'Size comparison'], 'duyet': ['Duyệt thiết kế', 'Design review'] };
   const routeName = id => T(...ROUTES[id]);
-  const curRoute = () => { const r = location.hash.slice(1); return ROUTES[r] ? r : 'ban-ve'; };
+  const curRoute = () => { const r = location.hash.slice(1).split('?')[0]; return ROUTES[r] ? r : 'ban-ve'; };
+  // địa chỉ chia sẻ được: #ban-ve?co=H40&lang=en (cỡ và ngôn ngữ nằm trên địa chỉ, cập nhật không làm đầy lịch sử)
+  const hashParams = () => new URLSearchParams(location.hash.split('?')[1] || '');
+  const sizeFromHash = () => { const c = (hashParams().get('co') || '').replace(/^H/i, ''); return S.findIndex(s => String(s.H) === c); };
+  const syncHash = () => { const h = '#' + curRoute() + '?co=H' + S[cur].H + (LANG === 'en' ? '&lang=en' : ''); if (location.hash !== h) history.replaceState(null, '', location.pathname + location.search + h); };
   const side = $('side'), menuBtn = $('btn-menu');
   const closeMenu = () => { side.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); };
   menuBtn.addEventListener('click', () => { side.classList.add('open'); menuBtn.setAttribute('aria-expanded', 'true'); side.querySelector('a')?.focus(); });
@@ -1060,6 +1108,8 @@ const DATA = /*@DATA@*/{};
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && side.classList.contains('open')) { closeMenu(); menuBtn.focus(); } });
   const routeLabels = id => { $('crumb').textContent = routeName(id); document.title = `${routeName(id)} · ${T('Thanh kê cốt thép PVC chữ U', 'PVC U-channel spacer')}`; };
   function route() {
+    const hl = hashParams().get('lang'); if ((hl === 'en' || hl === 'vi') && hl !== LANG) setLang(hl);
+    const hi = sizeFromHash(); if (hi >= 0 && hi !== cur) select(hi);
     const id = curRoute();
     Object.keys(ROUTES).forEach(k => { $('view-' + k).hidden = k !== id; });
     $('main').prepend($('view-' + id));          // màn hình đang mở đứng đầu: h1 đầu tiên của trang là h1 của nó
@@ -1067,6 +1117,7 @@ const DATA = /*@DATA@*/{};
     routeLabels(id);
     closeMenu();
     if (id === 'thanh-cat' || id === 'so-sanh') renderCharts();
+    syncHash();
     window.scrollTo(0, 0);
   }
   addEventListener('hashchange', route);
@@ -1097,17 +1148,32 @@ const DATA = /*@DATA@*/{};
     applyStatic(); setTheme(root.dataset.theme);
     const s = S[cur];
     drawSheet($('d-sheet'), s); renderSpecs(s); renderCut(); renderCharts(); renderTable();
-    renderCmpFinding(); renderReview(); routeLabels(curRoute());
+    renderCmpFinding(); renderReview(); routeLabels(curRoute()); syncHash();
   }
   document.querySelectorAll('[data-lang]').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
 
+  $('btn-link').addEventListener('click', async () => {
+    syncHash(); const url = location.href.split('#')[0].split('?')[0] + location.hash; let ok = false;
+    try { await navigator.clipboard.writeText(url); ok = true; } catch (e) { try { const ta = document.createElement('textarea'); ta.value = url; ta.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); ta.remove(); } catch (e2) {} }
+    const msg = ok ? T('Đã sao chép liên kết', 'Link copied') : T('Không sao chép được: hãy sao chép từ thanh địa chỉ', 'Could not copy: copy it from the address bar');
+    $('link-status').textContent = msg; const lab = $('btn-link').querySelector('span'); lab.textContent = ok ? T('Đã sao chép', 'Copied') : T('Lỗi sao chép', 'Copy failed');
+    setTimeout(() => { lab.innerHTML = LANG === 'en' ? lab.dataset.en : lab.dataset.vi; $('link-status').textContent = ''; }, 2200);
+  });
+  document.querySelector('.skip').addEventListener('click', e => { e.preventDefault(); $('main').focus(); });
+
   applyStatic(); setTheme(root.dataset.theme);
-  const saved = store.get('kh-size', null), start = Math.max(0, S.findIndex(s => String(s.H) === String(saved)));
+  const saved = store.get('kh-size', null), fromHash = sizeFromHash();   // cỡ trên địa chỉ được ưu tiên hơn cỡ đã lưu trên máy
+  const start = fromHash >= 0 ? fromHash : Math.max(0, S.findIndex(s => String(s.H) === String(saved)));
   select(start);
   renderCmpFinding();
   renderReview();
   route();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { drawSheet($('d-sheet'), S[cur]); });
+
+  // in ra giấy luôn dùng giao diện sáng (nền trắng, chữ đen), rồi trả lại giao diện đang dùng
+  let printedDark = false;
+  addEventListener('beforeprint', () => { if (root.dataset.theme === 'dark') { printedDark = true; setTheme('light'); renderCharts(); } });
+  addEventListener('afterprint', () => { if (printedDark) { printedDark = false; setTheme('dark'); renderCharts(); } });
 })();
 </script>
 <script>/*@DASH3D@*/</script>
