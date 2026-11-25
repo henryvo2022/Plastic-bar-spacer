@@ -405,7 +405,7 @@ function export2D() {
   const rows = [
     [[LT('Sản phẩm', 'Product'), LT('Thanh kê cốt thép PVC chữ U', 'PVC U-channel rebar spacer')], [LT('Mã / kích thước', 'Code / size'), `${s.code} · ${nf(s.W)} × ${nf(s.H)} mm`]],
     [[LT('Số hiệu bản vẽ', 'Drawing no.'), `${s.code}-BV01 · ${LT('lần sửa đổi', 'rev.')} A · ${LT('tờ', 'sheet')} 1/1`], [LT('Giai đoạn / ngày', 'Stage / date'), LT(`Duyệt thiết kế · ${st.date}`, `Design review · ${st.date}`)]],
-    [[LT('Vật liệu', 'Material'), LT('uPVC tái chế', 'Recycled uPVC')], [LT('Công nghệ', 'Process'), LT('Đùn ép biên dạng, dập lỗ liên tục', 'Profile extrusion, continuous punching')]],
+    [[LT('Vật liệu', 'Material'), 'uPVC'], [LT('Công nghệ', 'Process'), LT('Đùn ép biên dạng, dập lỗ liên tục', 'Profile extrusion, continuous punching')]],
     [[LT('Chiều dài thanh', 'Bar length'), LT(`${nf(st.L, 0)} mm, lỗ ở đầu thanh ngẫu nhiên`, `${nf(st.L, 0)} mm, random hole position at bar ends`)], [LT('Đơn vị', 'Units'), 'mm']],
     [[LT('Tỷ lệ', 'Scale'), LT(`Hình chính 1:1 · chi tiết 1, 2 tỷ lệ ${svg.dataset.ratio}:1`, `Main views 1:1 · details 1, 2 at ${svg.dataset.ratio}:1`)], [LT('Phương pháp chiếu', 'Projection'), LT('Góc thứ nhất', 'First angle')]],
     [[LT('Dung sai', 'Tolerances'), LT('Lớp bảo vệ c = H ±1 mm (đề xuất); kích thước khác chờ thống nhất', 'Cover c = H ±1 mm (proposed); other dimensions to be agreed')], [LT('Lập / Kiểm / Duyệt', 'Drawn / Checked / Approved'), '........ / ........ / ........']],
