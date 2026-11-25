@@ -133,8 +133,8 @@ def page(e, r):
 <h2>Thông số kỹ thuật <i>Technical Data</i></h2>
 <div class="tb"><table>{left}</table><table>{right}</table></div>
 <div class="note"><b>*</b> <b>{NOTE_VI}.</b><i>{NOTE_EN}</i></div>
-<div class="fine">Tải phá hủy ước tính: tải tập trung qua thanh thép đặt trên thanh kê, tính bằng mô hình chưa hiệu chỉnh; chưa phải kết quả thử theo quy trình của DBV. Khối lượng tính với khối lượng riêng uPVC tái chế 1,48 g/cm³. Dung sai lớp bảo vệ ±1 mm là đề xuất, chờ thống nhất.
-<br>Breaking load: point load through a rebar placed on the spacer, from an uncalibrated model; not a DBV test result. Weight uses 1.48 g/cm³ recycled uPVC. The ±1 mm cover tolerance is proposed and to be agreed.</div>
+<div class="fine">Tải phá hủy ước tính: tải tập trung qua thanh thép đặt trên thanh kê, tính bằng mô hình chưa hiệu chỉnh; chưa phải kết quả thử theo quy trình của DBV. Khối lượng tính với khối lượng riêng nhựa 1,8 g/cm³ (uPVC tái chế, có chất độn). Dung sai lớp bảo vệ ±1 mm là đề xuất, chờ thống nhất.
+<br>Breaking load: point load through a rebar placed on the spacer, from an uncalibrated model; not a DBV test result. Weight uses a resin density of 1.8 g/cm³ (recycled, filled uPVC). The ±1 mm cover tolerance is proposed and to be agreed.</div>
 <div class="foot"><div>HAN CORPORATION | han@hancorporation.vn</div><div>Ngày lập / Date of creation: {DATE}<br>Trang / Page 1/1</div></div>
 </div></body></html>"""
 
