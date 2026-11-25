@@ -92,6 +92,7 @@ function render() { if (renderer) { renderer.render(scene, camera); updateDims()
 // =====================================================================================
 let dimSvg = null, dimDefs = [], dimsOn = true;
 try { dimsOn = localStorage.getItem('kh-dims') !== '0'; } catch (e) {}
+if (new URLSearchParams(location.search).get('dims') === '0') dimsOn = false;      // ?dims=0: tắt kích thước (dùng khi chụp ảnh sản phẩm cho phiếu kỹ thuật)
 const SVGNS = 'http://www.w3.org/2000/svg';
 const svgEl = (tag, attrs, parent) => { const e = document.createElementNS(SVGNS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
 
